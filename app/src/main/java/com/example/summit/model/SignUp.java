@@ -7,11 +7,15 @@ public class SignUp {
 
     public void joinWaitingList(Entrant entrant, WaitingList list) {
         list.addEntrant(entrant);
+        Firebase.saveEntrant(entrant); //stub
+        Firebase.updateWaitingList(list);
         //TODO : push to firebase
     }
 
     public void leaveWaitingList(Entrant entrant, WaitingList list) {
         list.removeEntrant(entrant);
+        list.removeEntrant(entrant);
+        Firebase.updateWaitingList(list);
     }
 
     public void acceptInvitation(Entrant entrant) {

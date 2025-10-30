@@ -1,6 +1,7 @@
 package com.example.summit.model;
 
 public class Firebase {
-    public void saveEntrant(Entrant entrant) {}
-    public void updateWaitingList(WaitingList list) {}
+    public static void saveEntrant(Entrant entrant) {}
+    public static void updateWaitingList(WaitingList list) {}
+    public void saveEvent(Event event){}
 }
