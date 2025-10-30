@@ -26,10 +26,12 @@ public class Entrant extends User {
         notificationsEnabled = false;
     }
 
-    public void acceptInvitation() {    /*TODO : let entrant accept invitation*/
+    public void acceptInvitation() {
+        /*TODO : let entrant accept invitation*/
         this.invitationAccepted = true;
     }
-    public  void declineInvitation() {  /*TODO : let entrant accept invitation*/
+    public  void declineInvitation() {
+        /*TODO : let entrant accept invitation*/
         this.invitationAccepted = false;
     }
 
