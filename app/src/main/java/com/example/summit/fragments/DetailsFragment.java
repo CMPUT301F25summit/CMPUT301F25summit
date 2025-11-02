@@ -1,5 +1,6 @@
 package com.example.summit.fragments;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.example.summit.R;
+import com.example.summit.model.Entrant;
+import com.example.summit.model.Firebase;
+import com.example.summit.model.User;
 
 public class DetailsFragment extends Fragment {
     private EditText inputName, inputEmail, inputPhone;
@@ -50,5 +56,18 @@ public class DetailsFragment extends Fragment {
             return;
         }
 
+        String deviceId = android.provider.Settings.Secure.getString(
+                requireContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID
+        );
+
+        Bundle args = new Bundle();
+        args.putString("deviceId", deviceId);
+        args.putString("name", name);
+        args.putString("email", email);
+        args.putString("phone", phone);
+
+        //navigate to event list screen
+        NavHostFragment.findNavController(this).navigate(R.id.action_DetailsFragment_to_EventListFragment);
     }
 }
