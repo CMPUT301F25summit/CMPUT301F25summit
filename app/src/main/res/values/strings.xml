@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">summit</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="submit">Submit</string>
+    <string name="email_address">Email Address</string>
+    <string name="full_name">Full Name</string>
 </resources>

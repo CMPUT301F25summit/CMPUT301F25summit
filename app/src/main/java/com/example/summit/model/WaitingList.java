@@ -34,7 +34,7 @@ public class WaitingList {
     //to find entrant by id, would be useful for accepting/declining invitations if implemented :)
     public Entrant getEntrantById(String id) {
         for (Entrant entrant : entrants) {
-            if (entrant.getId().equals(id)) {
+            if (entrant.getDeviceId().equals(id)) {
                 return entrant;
             }
         }
