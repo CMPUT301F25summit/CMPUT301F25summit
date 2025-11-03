@@ -1,5 +1,6 @@
 package com.example.summit.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.summit.EntrantActivity;
+import com.example.summit.OrganizerActivity;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
@@ -55,8 +57,8 @@ public class RoleSelectionFragment extends Fragment {
             Organizer o = new Organizer(name, email, deviceId, phone);
             Firebase.saveOrganizer(o);
             Toast.makeText(getContext(), "Signed in as Organizer!", Toast.LENGTH_SHORT).show();
-            NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_RoleSelectionFragment_to_OrganizerDashboardFragment);
+            startActivity(new Intent(getActivity(), OrganizerActivity.class));
+            requireActivity().finish();
         });
 
         return view;
