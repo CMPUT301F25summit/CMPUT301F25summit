@@ -5,16 +5,16 @@ import java.time.LocalDate;
 public class EventDescription {
     private String title;
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalDate registrationStart;
-    private LocalDate registrationEnd;
+    private String startDate;
+    private String endDate;
+    private String registrationStart;
+    private String registrationEnd;
     private int maxAttendees; //for organizer limits;
     private String posterUrl;   //for event poster image
 
     public EventDescription(String title, String description,
-                            LocalDate startDate, LocalDate endDate,
-                            LocalDate registrationStart, LocalDate registrationEnd,
+                            String startDate, String endDate,
+                            String registrationStart, String registrationEnd,
                             int maxAttendees, String posterUrl) {
         this.title = title;
         this.description = description;
@@ -34,17 +34,17 @@ public class EventDescription {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public String getStartDate() { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
 
-    public LocalDate getRegistrationStart() { return registrationStart; }
-    public void setRegistrationStart(LocalDate registrationStart) { this.registrationStart = registrationStart; }
+    public String getRegistrationStart() { return registrationStart; }
+    public void setRegistrationStart(String registrationStart) { this.registrationStart = registrationStart; }
 
-    public LocalDate getRegistrationEnd() { return registrationEnd; }
-    public void setRegistrationEnd(LocalDate registrationEnd) { this.registrationEnd = registrationEnd; }
+    public String getRegistrationEnd() { return registrationEnd; }
+    public void setRegistrationEnd(String registrationEnd) { this.registrationEnd = registrationEnd; }
     
     public int getMaxAttendees() { return maxAttendees; }
     public void setMaxAttendees(int maxAttendees) { this.maxAttendees = maxAttendees; }
