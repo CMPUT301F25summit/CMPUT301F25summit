@@ -1,5 +1,6 @@
 package com.example.summit.fragments.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -13,10 +14,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.summit.EntrantActivity;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
 import com.example.summit.session.Session;
+import com.example.summit.OrganizerActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class DeviceIDFragment extends Fragment {
@@ -55,8 +58,9 @@ public class DeviceIDFragment extends Fragment {
                     if (doc.exists()) {
                         Entrant e = doc.toObject(Entrant.class);
                         Session.setEntrant(e);
-                        NavHostFragment.findNavController(this)
-                                .navigate(R.id.action_DeviceIDFragment_to_SearchForEventsFragment);
+                        startActivity(new Intent(getActivity(), EntrantActivity.class));
+                        requireActivity().finish();
+
                     } else {
                         db.collection("organizers")
                                 .document(deviceId)
@@ -65,8 +69,9 @@ public class DeviceIDFragment extends Fragment {
                                     if (doc2.exists()) {
                                         Organizer o = doc2.toObject(Organizer.class);
                                         Session.setOrganizer(o);
-                                        NavHostFragment.findNavController(this)
-                                                .navigate(R.id.action_DeviceIDFragment_to_OrganizerDashboardFragment);
+                                        startActivity(new Intent(getActivity(), OrganizerActivity.class));
+                                        requireActivity().finish();
+
                                     } else {
                                         Bundle args = new Bundle();
                                         args.putString("deviceId", deviceId);
