@@ -3,8 +3,8 @@ package com.example.summit.model;
 public class Entrant extends User {
     private boolean notificationsEnabled;
     private Boolean invitationAccepted;
-    public Entrant (String id, String name, String email, String deviceId) {
-        super (id, name, email, deviceId);
+    public Entrant (String name, String email, String deviceId, String phone) {
+        super (name, email, deviceId, phone);
         this.notificationsEnabled = true; //set to true since entrant allowed to opt-out
     }
     public Entrant() {} // TODO: overload for firebase

@@ -1,6 +1,6 @@
-package com.example.summit.fragments.login;
-import android.content.Intent;
+package com.example.summit.fragments;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.example.summit.R;
+import com.example.summit.model.Entrant;
+import com.example.summit.model.Firebase;
+import com.example.summit.model.User;
 
 public class DetailsFragment extends Fragment {
     private EditText inputName, inputEmail, inputPhone;
@@ -23,11 +28,12 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_enter_details, container, false);
+        View view = inflater.inflate(R.layout.enterdetails, container, false);
 
         if(getActivity() != null) {
             ((androidx.appcompat.app.AppCompatActivity) getActivity())
-                    .getSupportActionBar();
+                    .getSupportActionBar()
+                    .setTitle("Enter Details");
         }
 
         inputName = view.findViewById(R.id.input_name);
@@ -50,18 +56,18 @@ public class DetailsFragment extends Fragment {
             return;
         }
 
-        Toast.makeText(getContext(), "Details submitted!", Toast.LENGTH_SHORT).show();
+        String deviceId = android.provider.Settings.Secure.getString(
+                requireContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID
+        );
 
-        if(getActivity() != null) {
-            Intent intent = new Intent(getActivity(), com.example.summit.EntrantActivity.class);
+        Bundle args = new Bundle();
+        args.putString("deviceId", deviceId);
+        args.putString("name", name);
+        args.putString("email", email);
+        args.putString("phone", phone);
 
-            intent.putExtra("name", name);
-            intent.putExtra("email", email);
-            intent.putExtra("phone", phone);
-
-            startActivity(intent);
-            getActivity().finish();
-        }
-
+        //navigate to event list screen
+        NavHostFragment.findNavController(this).navigate(R.id.action_DetailsFragment_to_EventListFragment);
     }
 }

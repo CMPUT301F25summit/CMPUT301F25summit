@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:hint="Full Name"
             android:backgroundTint="#9E9E9E"
+
             android:inputType="textPersonName"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

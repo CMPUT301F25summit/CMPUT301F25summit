@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/DeviceIDFragment">
 
     <fragment
         android:id="@+id/DeviceIDFragment"
-        android:name="com.example.summit.fragments.login.DeviceIDFragment"
-        android:label="Welcome to Summit!">
+        android:name="com.example.summit.fragments.DeviceIDFragment">
         <action
             android:id="@+id/action_DeviceIDFragment_to_DetailsFragment"
             app:destination="@id/DetailsFragment" />
@@ -15,6 +15,41 @@
 
     <fragment
         android:id="@+id/DetailsFragment"
-        android:name="com.example.summit.fragments.login.DetailsFragment"
-        android:label="Please Enter Details" />
+        android:name="com.example.summit.fragments.DetailsFragment">
+        <action
+            android:id="@+id/action_DetailsFragment_to_RoleSelectionFragment"
+            app:destination="@id/RoleSelectionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/RoleSelectionFragment"
+        android:name="com.example.summit.fragments.RoleSelectionFragment"
+        tools:layout="@layout/role_selection">
+        <action
+            android:id="@+id/action_RoleSelectionFragment_to_EventListFragment"
+            app:destination="@id/EventListFragment" />
+        <action
+            android:id="@+id/action_RoleSelectionFragment_to_OrganizerDashboardFragment"
+            app:destination="@id/OrganizerDashboardFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/EventListFragment"
+        android:name="com.example.summit.fragments.EventListFragment"
+        tools:layout="@layout/fragment_event_list">
+        <action
+            android:id="@+id/action_EventListFragment_to_EventDetailsFragment"
+            app:destination="@id/EventDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/OrganizerDashboardFragment"
+        android:name="com.example.summit.fragments.OrganizerDashboardFragment"
+        tools:layout="@layout/fragment_organizer_dashboard" />
+
+    <fragment
+        android:id="@+id/EventDetailsFragment"
+        android:name="com.example.summit.fragments.EventDetailsFragment"
+        tools:layout="@layout/fragment_event_details" />
+
 </navigation>
