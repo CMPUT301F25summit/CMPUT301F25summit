@@ -57,8 +57,16 @@ public class DeviceIDFragment extends Fragment {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         Entrant e = doc.toObject(Entrant.class);
-                        Session.setEntrant(e);
+                        if (e!=null) {
+                            Session.setEntrant(e);
+                            Toast.makeText(getContext(),
+                                    "Signed in as " + e.getName(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                         startActivity(new Intent(getActivity(), EntrantActivity.class));
+
+
                         requireActivity().finish();
 
                     } else {
@@ -85,6 +93,7 @@ public class DeviceIDFragment extends Fragment {
                         Toast.makeText(getContext(), "Login failed, try again", Toast.LENGTH_SHORT).show()
                 );
     }
+
 }
 
 

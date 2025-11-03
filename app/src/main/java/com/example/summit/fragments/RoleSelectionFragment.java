@@ -1,5 +1,6 @@
 package com.example.summit.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.summit.EntrantActivity;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
@@ -45,8 +47,8 @@ public class RoleSelectionFragment extends Fragment {
             Firebase.saveEntrant(e);
             Session.setEntrant(e);
             Toast.makeText(getContext(), "Signed in as Entrant!", Toast.LENGTH_SHORT).show();
-            NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_RoleSelectionFragment_to_EventListFragment);
+            startActivity(new Intent(getActivity(), EntrantActivity.class));
+            requireActivity().finish();
         });
 
         organizerBtn.setOnClickListener(v -> {
