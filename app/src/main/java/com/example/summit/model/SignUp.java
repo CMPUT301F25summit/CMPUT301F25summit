@@ -1,6 +1,9 @@
 package com.example.summit.model;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class SignUp {
+
 
     public SignUp() {
     }
@@ -29,6 +32,24 @@ public class SignUp {
         }
         else return false;
     }
+
+    public void joinEventFirestore(Entrant entrant, String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("events")
+                .document(eventId)
+                .collection("waitingList")
+                .document(entrant.getDeviceId())
+                .set(entrant)
+                .addOnSuccessListener(aVoid -> {
+                    System.out.println("Entrant added to waiting list!");
+                })
+                .addOnFailureListener(e -> {
+                    System.out.println("Failed to add entrant: " + e.getMessage());
+                });
+    }
+
+
 
     public boolean leaveEvent(Entrant entrant, WaitingList list) {
         if (list.getEntrants().contains(entrant)) {

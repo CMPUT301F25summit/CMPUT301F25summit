@@ -16,6 +16,7 @@ import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
 import com.example.summit.model.Firebase;
+import com.example.summit.session.Session;
 
 public class RoleSelectionFragment extends Fragment {
 
@@ -30,6 +31,10 @@ public class RoleSelectionFragment extends Fragment {
         Button organizerBtn = view.findViewById(R.id.button_organizer);
 
         Bundle args = getArguments();
+        if (args == null) {
+            Toast.makeText(getContext(), "missing user data", Toast.LENGTH_SHORT).show();
+            return view;
+        }
         String deviceId = args.getString("deviceId");
         String name = args.getString("name");
         String email = args.getString("email");
@@ -38,6 +43,7 @@ public class RoleSelectionFragment extends Fragment {
         entrantBtn.setOnClickListener(v -> {
             Entrant e = new Entrant(name, email, deviceId, phone);
             Firebase.saveEntrant(e);
+            Session.setEntrant(e);
             Toast.makeText(getContext(), "Signed in as Entrant!", Toast.LENGTH_SHORT).show();
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_RoleSelectionFragment_to_EventListFragment);
