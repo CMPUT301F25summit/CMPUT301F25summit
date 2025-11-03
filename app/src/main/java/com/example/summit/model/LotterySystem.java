@@ -17,8 +17,8 @@ public class LotterySystem {
     /***
      * Randomly samples entrants from a waiting list
      *
-     * This works under the assumption that all entrants in the waiting list can be chosen
-     * for the event (Users invited already shouldn't be in the waitinglist)
+     * <p>This works under the assumption that all entrants in the waiting list can be chosen
+     * for the event (Users invited already shouldn't be in the waitinglist) </p>
      *
      * returns - List of randomly sampled entrants
      */
