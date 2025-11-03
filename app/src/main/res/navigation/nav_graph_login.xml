@@ -6,7 +6,8 @@
 
     <fragment
         android:id="@+id/DeviceIDFragment"
-        android:name="com.example.summit.fragments.DeviceIDFragment">
+        android:name="com.example.summit.fragments.login.DeviceIDFragment"
+        android:label="Welcome to Summit!">
         <action
             android:id="@+id/action_DeviceIDFragment_to_DetailsFragment"
             app:destination="@id/DetailsFragment" />
@@ -14,5 +15,6 @@
 
     <fragment
         android:id="@+id/DetailsFragment"
-        android:name="com.example.summit.fragments.DetailsFragment" />
+        android:name="com.example.summit.fragments.login.DetailsFragment"
+        android:label="Please Enter Details" />
 </navigation>

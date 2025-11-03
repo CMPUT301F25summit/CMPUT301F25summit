@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +22,11 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.enterdetails, container, false);
+        View view = inflater.inflate(R.layout.fragment_enter_details, container, false);
 
         if(getActivity() != null) {
             ((androidx.appcompat.app.AppCompatActivity) getActivity())
-                    .getSupportActionBar()
-                    .setTitle("Enter Details");
+                    .getSupportActionBar();
         }
 
         inputName = view.findViewById(R.id.input_name);
