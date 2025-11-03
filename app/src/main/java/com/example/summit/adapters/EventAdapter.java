@@ -65,7 +65,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         EventDescription desc = event.getDescription();
 
         holder.eventTitle.setText(desc.getTitle());
-        holder.eventDates.setText(desc.getStartDate() + " - " + desc.getEndDate());
+        holder.eventDates.setText(
+                "Registration: " + desc.getRegistrationStart() + " - " + desc.getRegistrationEnd()
+        );
 
         Glide.with(context)
                 .load(desc.getPosterUrl())
