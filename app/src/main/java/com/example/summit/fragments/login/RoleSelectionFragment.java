@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 
 import android.app.Activity;
 import android.content.Intent;

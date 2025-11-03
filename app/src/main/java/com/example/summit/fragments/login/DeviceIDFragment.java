@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-
 import com.example.summit.EntrantActivity;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
@@ -83,7 +82,7 @@ public class DeviceIDFragment extends Fragment {
                                     } else {
                                         Bundle args = new Bundle();
                                         args.putString("deviceId", deviceId);
-                                        NavHostFragment.findNavController(this)
+                                        NavHostFragment.findNavController(DeviceIDFragment.this)
                                                 .navigate(R.id.action_DeviceIDFragment_to_DetailsFragment, args);
                                     }
                                 });

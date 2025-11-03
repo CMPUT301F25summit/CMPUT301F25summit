@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/RoleSelectionFragment"
-        android:name="com.example.summit.fragments.RoleSelectionFragment"
+        android:name="com.example.summit.fragments.login.RoleSelectionFragment"
         tools:layout="@layout/role_selection">
         <action
             android:id="@+id/action_RoleSelectionFragment_to_EventListFragment"
@@ -35,7 +35,7 @@
 
     <fragment
         android:id="@+id/EventListFragment"
-        android:name="com.example.summit.fragments.EventListFragment"
+        android:name="com.example.summit.fragments.organizer.EventListFragment"
         tools:layout="@layout/fragment_event_list">
         <action
             android:id="@+id/action_EventListFragment_to_EventDetailsFragment"
@@ -44,12 +44,12 @@
 
     <fragment
         android:id="@+id/OrganizerDashboardFragment"
-        android:name="com.example.summit.fragments.OrganizerDashboardFragment"
+        android:name="com.example.summit.fragments.organizer.OrganizerDashboardFragment"
         tools:layout="@layout/fragment_organizer_dashboard" />
 
     <fragment
         android:id="@+id/EventDetailsFragment"
-        android:name="com.example.summit.fragments.EventDetailsFragment"
+        android:name="com.example.summit.fragments.organizer.EventDetailsFragment"
         tools:layout="@layout/fragment_event_details" />
 
 </navigation>
