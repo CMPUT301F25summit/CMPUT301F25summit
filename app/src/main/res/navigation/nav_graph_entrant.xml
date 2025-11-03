@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_entrant.xml"
+    app:startDestination="@id/searchForEventsFragment">
+
+    <fragment
+        android:id="@+id/searchForEventsFragment"
+        android:name="com.example.summit.fragments.entrant.SearchForEventsFragment"
+        android:label="Search For Events"
+        tools:layout="@layout/fragment_searchforevents"/>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.summit.fragments.entrant.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile"/>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.summit.fragments.entrant.NotificationsFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notifications"/>
+
+</navigation>

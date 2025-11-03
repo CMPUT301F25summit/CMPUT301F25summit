@@ -1,5 +1,6 @@
 package com.example.summit.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,24 +15,32 @@ import com.example.summit.R;
 import com.example.summit.model.Event;
 import com.example.summit.model.EventDescription;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
-
-    private List<Event> events;
-    private OnEventClickListener listener;
 
     public interface OnEventClickListener {
         void onEventClick(Event event);
     }
 
-    public EventAdapter(List<Event> events, OnEventClickListener listener) {
-        this.events = events;
+    private List<Event> events = new ArrayList<>();
+    private Context context;
+    private OnEventClickListener listener;
+
+    public EventAdapter(Context context, OnEventClickListener listener) {
+        this.context = context;
         this.listener = listener;
     }
 
+    public void updateEvents(List<Event> newEvents) {
+        this.events = newEvents;
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView eventTitle, eventDates;
+        TextView eventTitle;
+        TextView eventDates;
         ImageView eventPoster;
 
         public ViewHolder(View view) {
@@ -44,8 +53,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+    public EventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
                 .inflate(R.layout.item_event_card, parent, false);
         return new ViewHolder(view);
     }
@@ -56,10 +65,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         EventDescription desc = event.getDescription();
 
         holder.eventTitle.setText(desc.getTitle());
-        holder.eventDates.setText(desc.getStartDate().toString() +
-                " - " + desc.getEndDate().toString());
+        holder.eventDates.setText(desc.getStartDate() + " - " + desc.getEndDate());
 
-        Glide.with(holder.itemView.getContext())
+        Glide.with(context)
                 .load(desc.getPosterUrl())
                 .placeholder(R.drawable.placeholder_event)
                 .into(holder.eventPoster);
@@ -72,5 +80,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return events.size();
     }
 }
+
 
 

@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.organizer;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,14 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.summit.R;
-import com.example.summit.model.Event;
 
-public class EventDetailsFragment extends Fragment {
+public class OrganizerDashboardFragment extends Fragment {
 
-    private Event event; // Will display event info later
-
-    public EventDetailsFragment() {
-        super(R.layout.fragment_event_details);
+    public OrganizerDashboardFragment() {
+        super(R.layout.fragment_organizer_dashboard);
     }
 
     @Nullable
@@ -25,6 +22,7 @@ public class EventDetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_event_details, container, false);
+        return inflater.inflate(R.layout.fragment_organizer_dashboard, container, false);
     }
 }
+

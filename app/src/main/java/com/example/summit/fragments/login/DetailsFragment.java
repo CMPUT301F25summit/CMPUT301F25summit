@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -28,7 +28,7 @@ public class DetailsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.enterdetails, container, false);
+        View view = inflater.inflate(R.layout.fragment_enter_details, container, false);
 
         if(getActivity() != null) {
             ((androidx.appcompat.app.AppCompatActivity) getActivity())
@@ -68,6 +68,7 @@ public class DetailsFragment extends Fragment {
         args.putString("phone", phone);
 
         //navigate to event list screen
-        NavHostFragment.findNavController(this).navigate(R.id.action_DetailsFragment_to_EventListFragment);
+        NavHostFragment.findNavController(this)
+                .navigate(R.id.action_DetailsFragment_to_RoleSelectionFragment, args);
     }
 }
