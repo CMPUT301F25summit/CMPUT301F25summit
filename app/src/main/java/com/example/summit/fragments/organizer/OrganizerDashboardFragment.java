@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.organizer;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
