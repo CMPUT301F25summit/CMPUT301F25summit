@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.LayoutInflater;

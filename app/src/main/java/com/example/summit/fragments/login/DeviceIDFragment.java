@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,7 +18,7 @@ public class DeviceIDFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.cont_w_deviceid, container, false);
+        View view = inflater.inflate(R.layout.fragment_device_id, container, false);
 
         Button continueButton = view.findViewById(R.id.continue_button);
         continueButton.setOnClickListener(v -> {
