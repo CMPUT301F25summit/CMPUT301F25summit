@@ -68,6 +68,7 @@ public class DetailsFragment extends Fragment {
         args.putString("phone", phone);
 
         //navigate to event list screen
-        NavHostFragment.findNavController(this).navigate(R.id.action_DetailsFragment_to_RoleSelectionFragment);
+        NavHostFragment.findNavController(this)
+                .navigate(R.id.action_DetailsFragment_to_RoleSelectionFragment, args);
     }
 }
