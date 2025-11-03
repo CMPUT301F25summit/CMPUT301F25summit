@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +13,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.summit.R;
 import com.example.summit.model.Event;
+import com.example.summit.model.SignUp;
+import com.example.summit.session.Session;
+import com.example.summit.model.Entrant;
 
 public class EventDetailsFragment extends Fragment {
 
@@ -22,9 +27,26 @@ public class EventDetailsFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_event_details, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        super.onViewCreated(view, savedInstanceState);
+        String eventId = getArguments() != null ? getArguments().getString("eventId") : null;
+        Entrant currentEntrant = Session.getEntrant();
+        if (currentEntrant == null) {
+            Toast.makeText(getContext(), "No entrant session found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (eventId == null) {
+            Toast.makeText(getContext(), "Missing event id", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Button joinBtn = view.findViewById(R.id.button_join);
+        joinBtn.setOnClickListener(v -> {
+            SignUp signup = new SignUp();
+            signup.joinEventFirestore(currentEntrant, eventId);
+            Toast.makeText(getContext(), "Joined waiting list!", Toast.LENGTH_SHORT).show();
+        });
     }
+
 }
