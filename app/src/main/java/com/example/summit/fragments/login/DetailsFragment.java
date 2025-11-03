@@ -1,4 +1,5 @@
 package com.example.summit.fragments.login;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,19 @@ public class DetailsFragment extends Fragment {
         if(name.isEmpty() || email.isEmpty()) {
             Toast.makeText(getContext(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        Toast.makeText(getContext(), "Details submitted!", Toast.LENGTH_SHORT).show();
+
+        if(getActivity() != null) {
+            Intent intent = new Intent(getActivity(), com.example.summit.EntrantActivity.class);
+
+            intent.putExtra("name", name);
+            intent.putExtra("email", email);
+            intent.putExtra("phone", phone);
+
+            startActivity(intent);
+            getActivity().finish();
         }
 
     }

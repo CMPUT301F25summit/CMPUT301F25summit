@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="400dp"
+    android:background="#F5F5F5"
     android:padding="24dp"
     android:fitsSystemWindows="true">
 
@@ -18,22 +19,43 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Full Name"
+            android:backgroundTint="#9E9E9E"
             android:inputType="textPersonName"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="* Required"
+            android:textSize="10sp"
+            android:textColor="#9E9E9E"
+            app:layout_constraintTop_toBottomOf="@id/input_name"
+            app:layout_constraintStart_toStartOf="@id/input_name"
+            android:layout_marginTop="4dp"/>
         <EditText
             android:id="@+id/input_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Email Address"
+            android:backgroundTint="#9E9E9E"
             android:inputType="textEmailAddress"
             app:layout_constraintTop_toBottomOf="@id/input_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="* Required"
+            android:textSize="10sp"
+            android:textColor="#9E9E9E"
+            app:layout_constraintTop_toBottomOf="@id/input_email"
+            app:layout_constraintStart_toStartOf="@id/input_email"
+            android:layout_marginTop="4dp"/>
+
 
 
         <EditText
@@ -41,6 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Phone Number"
+            android:backgroundTint="#9E9E9E"
             android:inputType="phone"
             app:layout_constraintTop_toBottomOf="@id/input_email"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +76,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#212121"
             app:layout_constraintTop_toBottomOf="@id/input_phone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
