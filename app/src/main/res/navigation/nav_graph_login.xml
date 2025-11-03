@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/RoleSelectionFragment"
-        android:name="com.example.summit.fragments.RoleSelectionFragment"
+        android:name="com.example.summit.fragments.login.RoleSelectionFragment"
         tools:layout="@layout/role_selection">
         <action
             android:id="@+id/action_RoleSelectionFragment_to_EventListFragment"
