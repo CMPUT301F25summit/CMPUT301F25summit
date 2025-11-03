@@ -1,4 +1,4 @@
-package com.example.summit.fragments;
+package com.example.summit.fragments.login;
 
 import android.os.Bundle;
 import android.provider.Settings;
@@ -6,21 +6,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
 import com.example.summit.session.Session;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class    DeviceIDFragment extends Fragment {
+public class DeviceIDFragment extends Fragment {
 
     @Nullable
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        return inflater.inflate(R.layout.fragment_device_id, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Button continueButton = view.findViewById(R.id.continue_button);
@@ -28,6 +40,7 @@ public class    DeviceIDFragment extends Fragment {
     }
 
     private void checkUser() {
+
         String deviceId = Settings.Secure.getString(
                 requireContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID
@@ -35,7 +48,6 @@ public class    DeviceIDFragment extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Check entrants collection first
         db.collection("entrants")
                 .document(deviceId)
                 .get()
@@ -44,20 +56,18 @@ public class    DeviceIDFragment extends Fragment {
                         Entrant e = doc.toObject(Entrant.class);
                         Session.setEntrant(e);
                         NavHostFragment.findNavController(this)
-                                .navigate(R.id.action_DeviceIDFragment_to_EventListFragment);
+                                .navigate(R.id.action_DeviceIDFragment_to_SearchForEventsFragment);
                     } else {
-                        // Check organizers
                         db.collection("organizers")
                                 .document(deviceId)
                                 .get()
                                 .addOnSuccessListener(doc2 -> {
                                     if (doc2.exists()) {
                                         Organizer o = doc2.toObject(Organizer.class);
-                                        Session.setOrganizer(o); // similar to setEntrant
+                                        Session.setOrganizer(o);
                                         NavHostFragment.findNavController(this)
                                                 .navigate(R.id.action_DeviceIDFragment_to_OrganizerDashboardFragment);
                                     } else {
-                                        // Neither found → Go to Details page
                                         Bundle args = new Bundle();
                                         args.putString("deviceId", deviceId);
                                         NavHostFragment.findNavController(this)
@@ -65,9 +75,11 @@ public class    DeviceIDFragment extends Fragment {
                                     }
                                 });
                     }
-                });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Login failed, try again", Toast.LENGTH_SHORT).show()
+                );
     }
-
-
 }
+
 
