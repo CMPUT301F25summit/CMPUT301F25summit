@@ -7,18 +7,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class LotterySystem {
-    /*TODO: implement lottery logic - random selection
-    - update entrant invitation status (they get accept/decline option)
-    */
     // Represents the next in like entrants
-    ArrayList<Entrant> waitingListEntrantOrder;
+    List<Entrant> waitingListEntrantOrder;
     int totalEntrantsAcceptedInvited = 0;
     int totalSpots;
     // Represents currently invited entrants
-    ArrayList<Entrant> invitedEntrantList;
+    List<Entrant> invitedEntrantList;
 
     // Represents accepted entrants
-    ArrayList<Entrant> acceptedEntrants;
+    List<Entrant> acceptedEntrants;
 
     public LotterySystem(int totalSpots) {
         this.totalSpots = totalSpots;
@@ -33,12 +30,12 @@ public class LotterySystem {
      *    This function assumes that the WaitingList passed in does not change!
      * </h1>
      * <br>
-     * returns - List of randomly invited entrants
+     * returns - ArrayList of randomly invited entrants
      */
     public List<Entrant> sampleEntrants(WaitingList list, int spots) {
         if(this.totalEntrantsAcceptedInvited == 0) {
             // Create the random order to sample entrants in
-            ArrayList<Entrant> entrants = (ArrayList<Entrant>)list.getEntrants();
+            List<Entrant> entrants = (List<Entrant>)list.getEntrants();
             Collections.shuffle(entrants);
             this.waitingListEntrantOrder = entrants;
         }
@@ -59,6 +56,14 @@ public class LotterySystem {
         return newInvites;
     }
 
+    /***
+     *
+     * @param entrant - Entrant that responded to invitation
+     * @param accepted - boolean representing whether or not entrant accepted invitation
+     * <br>
+     *    This method adds entrants to the correct list depending on response
+     *    It does not replace the entrant
+     */
     public void handleEntrantResponse(Entrant entrant, boolean accepted) {
         if(accepted) {
             acceptedEntrants.add(entrant);
@@ -69,10 +74,18 @@ public class LotterySystem {
         }
     }
 
+    /***
+     *
+     * @return List of accepted entrants
+     */
     public List<Entrant> getAccepted() {
         return this.acceptedEntrants;
     }
 
+    /***
+     *
+     * @return List of invited entrants
+     */
     public List<Entrant> getInvited() {
         return this.invitedEntrantList;
     }
