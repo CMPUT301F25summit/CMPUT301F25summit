@@ -55,10 +55,10 @@ public class ManageEventsFragment extends Fragment {
             args.putString("eventId", event.getId());
 
             // placeholder for future ManageEntrantsFragment
-            Toast.makeText(getContext(), "Event selected: " + event.getDescription().getTitle(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "Event selected: " + event.getDescription().getTitle(), Toast.LENGTH_SHORT).show();
+            NavHostFragment.findNavController(this).
+                    navigate(R.id.action_eventList_to_eventDetailsOrganizer, args);
 
-//            NavHostFragment.findNavController(this)
-//                    .navigate(R.id.action_to_ManageEntrantsFragment, args);
         });
 
         recyclerView.setAdapter(adapter);
