@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image_event_poster"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_event"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/text_event_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Title"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/text_event_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Short description"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/text_reg_dates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registration: Start - End"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/text_capacity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capacity: 0"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/text_waiting_count"
+            android:text="Waiting: 0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/text_invited_count"
+            android:text="Invited: 0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/text_accepted_count"
+            android:text="Accepted: 0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Management actions -->
+        <Button
+            android:id="@+id/button_manage_entrants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage Entrants"/>
+
+        <Button
+            android:id="@+id/button_run_lottery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Run Lottery"
+            android:layout_marginTop="12dp"/>
+
+        <Button
+            android:id="@+id/button_edit_event"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Event"
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+</ScrollView>
+
+
+
+

@@ -1,4 +1,80 @@
 package com.example.summit.fragments.organizer;
 
-public class ManageEntrantsFragment {
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.summit.R;
+import com.example.summit.adapters.EntrantAdapter;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.example.summit.model.Entrant;
+
+public class ManageEntrantsFragment extends Fragment {
+
+    private String eventId;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private EntrantAdapter adapter;
+
+    public ManageEntrantsFragment() {
+        super(R.layout.fragment_manage_entrants);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        eventId = getArguments().getString("eventId", null);
+        if (eventId == null) {
+            Toast.makeText(getContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        RecyclerView rvEntrants = view.findViewById(R.id.rv_entrants);
+        rvEntrants.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        adapter = new EntrantAdapter(new ArrayList<>());
+        rvEntrants.setAdapter(adapter);
+
+        loadEntrants();
+    }
+
+    private void loadEntrants() {
+        db.collection("events")
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) return;
+
+                    List<String> waitingIds = (List<String>) doc.get("waitingList");
+
+                    if (waitingIds == null || waitingIds.isEmpty()) {
+                        Toast.makeText(getContext(), "No entrants yet", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    for (String entrantId : waitingIds) {
+                        db.collection("entrants")
+                                .document(entrantId)
+                                .get()
+                                .addOnSuccessListener(eDoc -> {
+                                    Entrant e = eDoc.toObject(Entrant.class);
+                                    if (e != null) {
+                                        adapter.addEntrant(e);
+                                    }
+                                });
+                    }
+                });
+    }
 }
+

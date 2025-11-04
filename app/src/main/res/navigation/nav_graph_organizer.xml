@@ -25,5 +25,25 @@
     <fragment
         android:id="@+id/ManageEventsFragment"
         android:name="com.example.summit.fragments.organizer.ManageEventsFragment"
-        tools:layout="@layout/fragment_manage_events" />
+        tools:layout="@layout/fragment_manage_events">
+    <action
+        android:id="@+id/action_eventList_to_eventDetailsOrganizer"
+        app:destination="@id/EventDetailsOrganizerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/EventDetailsOrganizerFragment"
+        android:name="com.example.summit.fragments.organizer.EventDetailsOrganizerFragment"
+        tools:layout="@layout/fragment_event_details_organizer">
+    <action
+        android:id="@+id/action_eventDetailsOrganizer_to_manageEntrants"
+        app:destination="@id/manageEntrants"/>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageEntrants"
+        android:name="com.example.summit.fragments.organizer.ManageEntrantsFragment"
+        tools:layout="@layout/fragment_manage_entrants"/>
+
 </navigation>
