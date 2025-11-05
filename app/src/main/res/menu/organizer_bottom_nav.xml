@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ManageEventsFragment"
+        android:title="Events"
+        android:icon="@drawable/ic_event"/>
+
+    <item
+        android:id="@+id/NotificationsOrganizerFragment"
+        android:title="Notify"
+        android:icon="@drawable/ic_notifications"/>
+
+    <item
+        android:id="@+id/ProfileOrganizerFragment"
+        android:title="Profile"
+        android:icon="@drawable/ic_profile"/>
+
+</menu>
+
+

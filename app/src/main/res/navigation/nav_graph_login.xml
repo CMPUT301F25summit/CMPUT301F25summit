@@ -2,9 +2,10 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/nav_graph_login"
     app:startDestination="@id/DeviceIDFragment">
 
+    <!-- check deviceid -->
     <fragment
         android:id="@+id/DeviceIDFragment"
         android:name="com.example.summit.fragments.login.DeviceIDFragment">
@@ -13,6 +14,7 @@
             app:destination="@id/DetailsFragment" />
     </fragment>
 
+    <!-- enter details-->
     <fragment
         android:id="@+id/DetailsFragment"
         android:name="com.example.summit.fragments.login.DetailsFragment">
@@ -21,35 +23,10 @@
             app:destination="@id/RoleSelectionFragment" />
     </fragment>
 
+    <!-- user selects role -->
     <fragment
         android:id="@+id/RoleSelectionFragment"
         android:name="com.example.summit.fragments.login.RoleSelectionFragment"
-        tools:layout="@layout/role_selection">
-        <action
-            android:id="@+id/action_RoleSelectionFragment_to_EventListFragment"
-            app:destination="@id/EventListFragment" />
-        <action
-            android:id="@+id/action_RoleSelectionFragment_to_OrganizerDashboardFragment"
-            app:destination="@id/OrganizerDashboardFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/EventListFragment"
-        android:name="com.example.summit.fragments.organizer.EventListFragment"
-        tools:layout="@layout/fragment_event_list">
-        <action
-            android:id="@+id/action_EventListFragment_to_EventDetailsFragment"
-            app:destination="@id/EventDetailsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/OrganizerDashboardFragment"
-        android:name="com.example.summit.fragments.organizer.OrganizerDashboardFragment"
-        tools:layout="@layout/fragment_organizer_dashboard" />
-
-    <fragment
-        android:id="@+id/EventDetailsFragment"
-        android:name="com.example.summit.fragments.organizer.EventDetailsFragment"
-        tools:layout="@layout/fragment_event_details" />
-
+        tools:layout="@layout/role_selection" />
 </navigation>
+

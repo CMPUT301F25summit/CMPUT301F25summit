@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_host_organizer"
-    android:name="androidx.navigation.fragment.NavHostFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:navGraph="@navigation/nav_graph_organizer"
-    app:defaultNavHost="true" />
+    android:layout_height="match_parent">
+
+    <!-- Navigation Host for Organizer fragments -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_organizer"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/nav_graph_organizer"
+        app:defaultNavHost="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Organizer Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_organizer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/organizer_bottom_nav" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="90dp"
+        android:contentDescription="Add Event"
+        app:backgroundTint="#7F5CCA"
+        app:srcCompat="@drawable/ic_add"
+        app:tint="@android:color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
