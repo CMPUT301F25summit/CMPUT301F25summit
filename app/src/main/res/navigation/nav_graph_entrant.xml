@@ -23,4 +23,24 @@
         android:label="Notifications"
         tools:layout="@layout/fragment_notifications"/>
 
+    <fragment
+        android:id="@+id/eventDetailsFragment"
+        android:name="com.example.summit.fragments.organizer.EventDetailsFragment"
+        android:label="Event Details"
+        tools:layout="@layout/fragment_event_details"/>
+
+
+    <fragment
+        android:id="@+id/qrScannerFragment"
+        android:name="com.example.summit.fragments.entrant.QRScannerFragment"
+        android:label="Scan QR Code"
+        tools:layout="@layout/fragment_qr_scanner">
+
+
+        <action
+            android:id="@+id/action_qrScanner_to_eventDetails"
+            app:destination="@id/eventDetailsFragment" />
+    </fragment>
+
+
 </navigation>

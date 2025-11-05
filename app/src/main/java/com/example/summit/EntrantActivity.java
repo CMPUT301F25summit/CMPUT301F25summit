@@ -36,9 +36,15 @@ public class EntrantActivity extends AppCompatActivity {
             NavController navController = navHostFragment.getNavController();
             BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
             NavigationUI.setupWithNavController(bottomNav, navController);
+            
+            if (intent != null && "event_details".equals(intent.getStringExtra("fragment"))) {
+                String eventId = intent.getStringExtra("eventId");
+                if (eventId != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("eventId", eventId);
+                    navController.navigate(R.id.eventDetailsFragment, bundle);
+                }
+            }
         }
-
-
-
     }
 }
