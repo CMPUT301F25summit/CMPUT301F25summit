@@ -4,4 +4,20 @@
     <string name="submit">Submit</string>
     <string name="email_address">Email Address</string>
     <string name="full_name">Full Name</string>
+
+    <!-- Admin Events Filter Options -->
+    <string-array name="event_filter_options">
+        <item>All Events</item>
+        <item>By Location</item>
+        <item>By Organizer</item>
+        <item>By Status</item>
+    </string-array>
+
+    <!-- Admin Events Sort Options -->
+    <string-array name="event_sort_options">
+        <item>Event ID</item>
+        <item>Title (A-Z)</item>
+        <item>Date (Oldest First)</item>
+        <item>Date (Newest First)</item>
+    </string-array>
 </resources>
