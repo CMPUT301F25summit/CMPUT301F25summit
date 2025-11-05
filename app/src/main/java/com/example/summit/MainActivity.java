@@ -11,8 +11,30 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+/**
+ * The main activity for the application.
+ * <p>
+ * This activity serves as the entry point to the application.
+ * It hosts the {@link NavHostFragment} to manage login navigation.
+ */
+
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Called when the activity is first created.
+     * <p>
+     * This method initializes the activity, including:
+     * <ul>
+     * <li>Enabling edge-to-edge display </li>
+     * <li>Setting the content view </li>
+     * <li>Finding the {@link NavHostFragment} and linking its {@link NavController} </li>
+     * </ul>
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     * previously being shut down, this Bundle contains the data it most
+     * recently supplied in {@link #onSaveInstanceState(Bundle)}.
+     * Otherwise, it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -18,31 +18,80 @@ import com.example.summit.model.EventDescription;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link RecyclerView.Adapter} for displaying a list of {@link Event} objects
+ * in a card-based layout.
+ * <p>
+ * This adapter is responsible for inflating the event card layout ({@code R.layout.item_event_card}),
+ * binding {@link Event} data to the views, and handling click events on
+ * individual items via the {@link OnEventClickListener} interface. It uses
+ * the Glide library to load event poster images.
+ */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
+    /**
+     * A callback interface to handle click events on an event item
+     * in the RecyclerView.
+     */
     public interface OnEventClickListener {
+        /**
+         * Called when an event item view is clicked.
+         *
+         * @param event The {@link Event} object that was clicked.
+         */
         void onEventClick(Event event);
     }
 
+    /**
+     * The list of events this adapter displays.
+     */
     private List<Event> events = new ArrayList<>();
+    /**
+     * The application context, used for inflating layouts and Glide.
+     */
     private Context context;
+    /**
+     * The callback listener for item click events.
+     */
     private OnEventClickListener listener;
 
+    /**
+     * Constructs a new EventAdapter.
+     *
+     * @param context  The context for layout inflation and Glide operations.
+     * @param listener The listener to handle item clicks.
+     */
     public EventAdapter(Context context, OnEventClickListener listener) {
         this.context = context;
         this.listener = listener;
     }
 
+    /**
+     * Updates the adapter's data set with a new list of events and notifies
+     * the RecyclerView to refresh the UI.
+     *
+     * @param newEvents The new {@link List} of {@link Event} objects to display.
+     */
     public void updateEvents(List<Event> newEvents) {
         this.events = newEvents;
         notifyDataSetChanged();
     }
 
+    /**
+     * A static inner class that describes an item view and caches references
+     * to the subviews within it.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView eventTitle;
         TextView eventDates;
         ImageView eventPoster;
 
+        /**
+         * Constructs a new ViewHolder and finds the view references for the child views.
+         *
+         * @param view The root view of the item layout (inflated in
+         * {@link #onCreateViewHolder(ViewGroup, int)}).
+         */
         public ViewHolder(View view) {
             super(view);
             eventTitle = view.findViewById(R.id.eventTitle);
@@ -51,6 +100,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         }
     }
 
+    /**
+     * Called when RecyclerView needs a new {@link ViewHolder}.
+     * <p>
+     * This inflates the {@code R.layout.item_event_card} layout.
+     *
+     * @param parent   The ViewGroup into which the new View will be added.
+     * @param viewType The view type of the new View.
+     * @return A new ViewHolder that holds the view for an event item.
+     */
     @NonNull
     @Override
     public EventAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +117,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    /**
+     * Called by RecyclerView to display the data at the specified position.
+     * <p>
+     * This method gets the {@link Event} at the given position and binds its data
+     * (title, dates, poster) to the {@link ViewHolder}. It also sets the
+     * {@link android.view.View.OnClickListener} for the item.
+     *
+     * @param holder   The ViewHolder to be updated.
+     * @param position The position of the item in the data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = events.get(position);
@@ -77,6 +145,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(v -> listener.onEventClick(event));
     }
 
+    /**
+     * Returns the total number of items (events) in the data set held by the adapter.
+     *
+     * @return The total number of events in the list.
+     */
     @Override
     public int getItemCount() {
         return events.size();

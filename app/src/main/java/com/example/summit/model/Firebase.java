@@ -8,11 +8,28 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * A utility class for handling interactions with the Firebase Firestore database.
+ * <p>
+ * This class provides static methods for common database operations such as
+ * saving users (Entrants, Organizers) and loading event data.
+ * It encapsulates the {@link FirebaseFirestore} instance to provide a simple
+ * API for the rest of the application.
+ */
 public class Firebase {
-
+    /**
+     * The single, static instance of the FirebaseFirestore database.
+     */
     private static final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Saves or updates an {@link Entrant} object in the 'entrants' collection in Firestore.
+     * <p>
+     * The entrant's device ID is used as the unique document ID in Firestore.
+     * Logs success or failure to the console.
+     *
+     * @param entrant The Entrant object to be saved.
+     */
     public static void saveEntrant(Entrant entrant) {
         db.collection("entrants")
                 .document(entrant.getDeviceId())
@@ -21,6 +38,14 @@ public class Firebase {
                 .addOnFailureListener(e -> Log.e("Firebase", "Error: " + e));
     }
 
+    /**
+     * Saves or updates an {@link Organizer} object in the 'organizers' collection in Firestore.
+     * <p>
+     * The organizer's device ID is used as the unique document ID in Firestore.
+     * Logs success or failure to the console.
+     *
+     * @param organizer The Organizer object to be saved.
+     */
     public static void saveOrganizer(Organizer organizer){
         db.collection("organizers")
                 .document(organizer.getDeviceId())
@@ -31,6 +56,16 @@ public class Firebase {
     public static void updateWaitingList(WaitingList list) {}
     public void saveEvent(Event event){}
 
+    /**
+     * Asynchronously loads all event descriptions from the 'events' collection in Firestore.
+     * <p>
+     * On a successful retrieval, it deserializes each document into an
+     * {@link EventDescription} object and passes the resulting list to the
+     * provided callback. On failure, it logs an error.
+     *
+     * @param callback The {@link EventLoadCallback} to be invoked with the list
+     * of {@link EventDescription} objects on success, or to handle the error.
+     */
     public static void loadEvents(EventLoadCallback callback) {
         db.collection("events")
                 .get()
