@@ -14,9 +14,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.summit.AdminActivity;
 import com.example.summit.EntrantActivity;
 import com.example.summit.OrganizerActivity;
 import com.example.summit.R;
+import com.example.summit.model.Admin;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Organizer;
 import com.example.summit.model.Firebase;
@@ -33,6 +35,7 @@ public class RoleSelectionFragment extends Fragment {
 
         Button entrantBtn = view.findViewById(R.id.button_entrant);
         Button organizerBtn = view.findViewById(R.id.button_organizer);
+        Button adminBtn = view.findViewById(R.id.button_admin);
 
         Bundle args = getArguments();
         if (args == null) {
@@ -57,6 +60,15 @@ public class RoleSelectionFragment extends Fragment {
             Organizer o = new Organizer(name, email, deviceId, phone);
             Firebase.saveOrganizer(o);
             Toast.makeText(getContext(), "Signed in as Organizer!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getActivity(), OrganizerActivity.class));
+            requireActivity().finish();
+        });
+
+        adminBtn.setOnClickListener(v -> {
+            Admin a = new Admin(name, email, deviceId, phone);
+            //Firebase.saveAdmin(a);
+            Session.setAdmin(a);
+            Toast.makeText(getContext(), "Signed in as Admin!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getActivity(), OrganizerActivity.class));
             requireActivity().finish();
         });

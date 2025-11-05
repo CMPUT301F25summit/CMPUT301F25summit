@@ -19,4 +19,11 @@
         android:layout_marginTop="16dp"
         android:text="Organizer" />
 
+    <Button
+        android:id="@+id/button_admin"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Admin" />
+
 </LinearLayout>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/adminEventsFragment"
+        android:icon="@drawable/ic_search"
+        android:title="Events" />
+
+    <item
+        android:id="@+id/adminUserProfilesFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Users" />
+
+    <item
+        android:id="@+id/adminImageSettingsFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Images" />
+
+    <item
+        android:id="@+id/adminOrganizersFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Organizers" />
+
+    <item
+        android:id="@+id/adminNotificationsFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Notifications" />
+
+</menu>
