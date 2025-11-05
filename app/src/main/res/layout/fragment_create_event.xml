@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,99 +13,75 @@
             android:id="@+id/input_title"
             android:hint="Event Title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/input_description"
-            android:hint="Event Description"
+            android:hint="Description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"/>
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/input_location"
+            android:hint="Location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/input_capacity"
             android:hint="Capacity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/input_event_start"
+            android:hint="Event Start"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/input_event_end"
+            android:hint="Event End"
+            android:focusable="false"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/input_reg_start"
-            android:hint="Registration Start (YYYY-MM-DD)"
+            android:hint="Registration Start"
+            android:focusable="false"
+            android:clickable="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/input_reg_end"
-            android:hint="Registration End (YYYY-MM-DD)"
+            android:hint="Registration End"
+            android:focusable="false"
+            android:clickable="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"/>
 
         <Button
             android:id="@+id/button_create_event"
             android:text="Create Event"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"/>
-
-
-        <LinearLayout
-            android:id="@+id/qr_code_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="32dp"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event QR Code"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Share this QR code with attendees"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp"
-                android:textColor="@android:color/darker_gray" />
-
-            <!-- QR Code Image with Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
-
-                <ImageView
-                    android:id="@+id/qr_code_image"
-                    android:layout_width="300dp"
-                    android:layout_height="300dp"
-                    android:padding="16dp"
-                    android:contentDescription="QR code for event registration"
-                    android:scaleType="fitCenter"
-                    android:background="@android:color/white" />
-            </androidx.cardview.widget.CardView>
-
-            <!-- Save/Download Button -->
-            <Button
-                android:id="@+id/button_save_qr_code"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Download QR Code"
-                android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-        </LinearLayout>
-
-        <!-- ========== END QR CODE SECTION ========== -->
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
 </ScrollView>

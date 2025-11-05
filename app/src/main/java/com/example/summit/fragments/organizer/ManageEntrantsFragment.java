@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.summit.R;
 import com.example.summit.adapters.EntrantAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -33,7 +34,8 @@ public class ManageEntrantsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_add_event);
+        if (fab != null) fab.setVisibility(View.GONE);
         eventId = getArguments().getString("eventId", null);
         if (eventId == null) {
             Toast.makeText(getContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
@@ -44,6 +46,8 @@ public class ManageEntrantsFragment extends Fragment {
         rvEntrants.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new EntrantAdapter(new ArrayList<>());
+
+
         rvEntrants.setAdapter(adapter);
 
         loadEntrants();

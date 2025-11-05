@@ -14,6 +14,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -22,7 +23,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
     private TextView titleText, descText, regDatesText, capacityText,
             waitingCountText, invitedCountText, acceptedCountText;
     private ImageView posterImage;
-    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn;
+    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn, btnViewQr;
 
     private String eventId;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -34,6 +35,9 @@ public class EventDetailsOrganizerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        FloatingActionButton fab = getActivity().findViewById(R.id.fab_add_event);
+        if (fab != null) fab.setVisibility(View.GONE);
+
 
         eventId = getArguments() != null ? getArguments().getString("eventId") : null;
         if (eventId == null) {
@@ -60,6 +64,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
         manageEntrantsBtn = view.findViewById(R.id.button_manage_entrants);
         runLotteryBtn = view.findViewById(R.id.button_run_lottery);
         editEventBtn = view.findViewById(R.id.button_edit_event);
+        btnViewQr = view.findViewById(R.id.button_view_qr);
     }
 
     private void loadEventData() {
@@ -125,6 +130,14 @@ public class EventDetailsOrganizerFragment extends Fragment {
             Toast.makeText(getContext(), "TODO: Edit Event Screen Next",
                     Toast.LENGTH_SHORT).show();
         });
+
+        btnViewQr.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("eventId", eventId);
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_eventDetailsOrganizer_to_eventCreated, args);
+        });
+
     }
 }
 

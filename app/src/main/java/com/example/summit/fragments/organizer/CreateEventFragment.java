@@ -1,5 +1,6 @@
 package com.example.summit.fragments.organizer;
 
+import android.app.DatePickerDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,6 +23,7 @@ import com.example.summit.session.Session;
 import com.example.summit.utils.QRCodeGenerator;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,15 +38,11 @@ import java.util.Map;
  */
 public class CreateEventFragment extends Fragment {
 
-    private EditText titleInput, descInput, capacityInput, regStartInput, regEndInput;
+    private EditText titleInput, descInput, capacityInput, regStartInput, regEndInput, locationInput, eventStartInput, eventEndInput;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // QR Code views and data
-    private ImageView qrCodeImageView;
-    private Button saveQrCodeButton;
     private String currentEventId;
-    private Bitmap currentQrCodeBitmap;
-    private QrCode currentQrCode;
+
 
     public CreateEventFragment() {
         super(R.layout.fragment_create_event);
@@ -57,6 +55,26 @@ public class CreateEventFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_create_event, container, false);
     }
 
+    private void showDatePicker(EditText targetField) {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePicker = new DatePickerDialog(
+                getContext(),
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    // Month +1 because January = 0
+                    String formatted = String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                    targetField.setText(formatted);
+                },
+                year, month, day
+        );
+
+        datePicker.show();
+    }
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -66,19 +84,17 @@ public class CreateEventFragment extends Fragment {
         capacityInput = view.findViewById(R.id.input_capacity);
         regStartInput = view.findViewById(R.id.input_reg_start);
         regEndInput = view.findViewById(R.id.input_reg_end);
+        locationInput = view.findViewById(R.id.input_location);
+        eventStartInput = view.findViewById(R.id.input_event_start);
+        eventEndInput = view.findViewById(R.id.input_event_end);
 
-        // Initialize QR code views
-        qrCodeImageView = view.findViewById(R.id.qr_code_image);
-        saveQrCodeButton = view.findViewById(R.id.button_save_qr_code);
+        regStartInput.setOnClickListener(v -> showDatePicker(regStartInput));
+        regEndInput.setOnClickListener(v -> showDatePicker(regEndInput));
+        eventStartInput.setOnClickListener(v -> showDatePicker(eventStartInput));
+        eventEndInput.setOnClickListener(v -> showDatePicker(eventEndInput));
 
-        // Initially hide QR code section
-        if (qrCodeImageView != null) {
-            qrCodeImageView.setVisibility(View.GONE);
-        }
-        if (saveQrCodeButton != null) {
-            saveQrCodeButton.setVisibility(View.GONE);
-            saveQrCodeButton.setOnClickListener(v -> saveQrCodeToFirebase());
-        }
+
+
 
         Button createBtn = view.findViewById(R.id.button_create_event);
         createBtn.setOnClickListener(v -> createEvent());
@@ -95,6 +111,9 @@ public class CreateEventFragment extends Fragment {
         String cap = capacityInput.getText().toString().trim();
         String regStart = regStartInput.getText().toString().trim();
         String regEnd = regEndInput.getText().toString().trim();
+        String location = locationInput.getText().toString().trim();
+        String eventStart = eventStartInput.getText().toString().trim();
+        String eventEnd = eventEndInput.getText().toString().trim();
 
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(desc) ||
                 TextUtils.isEmpty(cap) || TextUtils.isEmpty(regStart) || TextUtils.isEmpty(regEnd)) {
@@ -114,7 +133,9 @@ public class CreateEventFragment extends Fragment {
         eventData.put("registrationEnd", regEnd);
         eventData.put("posterUrl", "");
         eventData.put("organizerId", organizerId);
-
+        eventData.put("location", location);
+        eventData.put("eventStart", eventStart);
+        eventData.put("eventEnd", eventEnd);
 
         db.collection("events")
                 .add(eventData)
@@ -122,79 +143,15 @@ public class CreateEventFragment extends Fragment {
                     // Event created successfully!
                     currentEventId = docRef.getId();
 
-                    Toast.makeText(getContext(), "Event Created!", Toast.LENGTH_SHORT).show();
+                    Bundle args = new Bundle();
+                    args.putString("eventId", currentEventId);
 
-                    // Generate QR code for the event
-                    generateAndDisplayQRCode(currentEventId);
+                    NavHostFragment.findNavController(this)
+                            .navigate(R.id.action_createEvent_to_eventCreated, args);
 
-                    // Optional: Comment this out if you want to show QR code before navigating away
-                    // NavHostFragment.findNavController(CreateEventFragment.this)
-                    //         .navigateUp();
                 })
 
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-    }
-
-    /**
-     * Generates and displays a QR code for the given event ID.
-     * The QR code encodes the event ID which can be scanned to view event details.
-     *
-     * @param eventId The unique identifier of the event
-     */
-    private void generateAndDisplayQRCode(String eventId) {
-        try {
-            // Generate QR code bitmap
-            currentQrCodeBitmap = QRCodeGenerator.generateQRCode(eventId);
-
-            if (currentQrCodeBitmap != null && qrCodeImageView != null) {
-                // Display the QR code
-                qrCodeImageView.setImageBitmap(currentQrCodeBitmap);
-                qrCodeImageView.setVisibility(View.VISIBLE);
-
-                if (saveQrCodeButton != null) {
-                    saveQrCodeButton.setVisibility(View.VISIBLE);
-                }
-
-                // Create QrCode object with Base64 data for Firebase storage
-                currentQrCode = new QrCode(eventId);
-                String base64Data = QRCodeGenerator.bitmapToBase64(currentQrCodeBitmap);
-                currentQrCode.setQrCodeData(base64Data);
-
-                // Automatically save QR code to Firebase
-                saveQrCodeToFirebase();
-
-                Toast.makeText(getContext(), "QR Code generated!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Failed to generate QR code",
-                        Toast.LENGTH_LONG).show();
-            }
-
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(getContext(), "Error: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-
-    /**
-     * Saves the generated QR code to Firebase Firestore.
-     * Stores the QrCode object including the Base64 encoded image data.
-     */
-    private void saveQrCodeToFirebase() {
-        if (currentQrCode == null || currentEventId == null) {
-            return;
-        }
-
-        // Save QR code data to Firebase
-        db.collection("qrcodes")
-                .document(currentEventId)
-                .set(currentQrCode)
-                .addOnSuccessListener(aVoid -> {
-                    // QR code saved successfully - silent save
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to save QR code: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                });
     }
 }

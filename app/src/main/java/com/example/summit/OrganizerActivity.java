@@ -4,9 +4,13 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
-import com.example.summit.R;
+import androidx.navigation.ui.NavigationUI;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class OrganizerActivity extends AppCompatActivity {
+
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,10 +20,28 @@ public class OrganizerActivity extends AppCompatActivity {
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_organizer);
+        navController = navHostFragment.getNavController();
 
-        if (navHostFragment != null) {
-            NavController navController = navHostFragment.getNavController();
-        }
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_nav_organizer);
+        NavigationUI.setupWithNavController(bottomNav, navController);
+
+        FloatingActionButton fab = findViewById(R.id.fab_add_event);
+
+        // ✅ FAB behavior
+        fab.setOnClickListener(v ->
+                navController.navigate(R.id.action_manageEvents_to_createEvent)
+        );
+
+        // ✅ FAB visibility control
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.ManageEventsFragment) {
+                fab.show();
+            } else {
+                fab.hide();
+            }
+        });
     }
 }
+
+
 

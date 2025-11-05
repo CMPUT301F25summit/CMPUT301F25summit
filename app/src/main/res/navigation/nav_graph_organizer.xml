@@ -3,47 +3,80 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_organizer"
-    app:startDestination="@id/OrganizerDashboardFragment">
+    app:startDestination="@id/ManageEventsFragment">
 
-    <fragment
-        android:id="@+id/OrganizerDashboardFragment"
-        android:name="com.example.summit.fragments.organizer.OrganizerDashboardFragment"
-        tools:layout="@layout/fragment_organizer_dashboard">
-        <action
-            android:id="@+id/action_to_CreateEventFragment"
-            app:destination="@id/CreateEventFragment"/>
-        <action
-            android:id="@+id/action_to_ManageEventsFragment"
-            app:destination="@id/ManageEventsFragment"/>
-    </fragment>
-
-    <fragment
-        android:id="@+id/CreateEventFragment"
-        android:name="com.example.summit.fragments.organizer.CreateEventFragment"
-        tools:layout="@layout/fragment_create_event" />
-
+    <!-- Main Events Screen -->
     <fragment
         android:id="@+id/ManageEventsFragment"
         android:name="com.example.summit.fragments.organizer.ManageEventsFragment"
         tools:layout="@layout/fragment_manage_events">
-    <action
-        android:id="@+id/action_eventList_to_eventDetailsOrganizer"
-        app:destination="@id/EventDetailsOrganizerFragment" />
+
+        <action
+            android:id="@+id/action_manageEvents_to_eventDetailsOrganizer"
+            app:destination="@id/EventDetailsOrganizerFragment"/>
+
+        <action
+            android:id="@+id/action_manageEvents_to_createEvent"
+            app:destination="@id/CreateEventFragment"/>
+
+        <action
+            android:id="@+id/action_manageEvents_to_notifications"
+            app:destination="@id/NotificationsOrganizerFragment" />
+
+        <action
+            android:id="@+id/action_manageEvents_to_profile"
+            app:destination="@id/ProfileOrganizerFragment" />
+
     </fragment>
 
+    <!-- Create Event -->
+    <fragment
+        android:id="@+id/CreateEventFragment"
+        android:name="com.example.summit.fragments.organizer.CreateEventFragment"
+        tools:layout="@layout/fragment_create_event"/>
+
+    <!-- Event Details -->
     <fragment
         android:id="@+id/EventDetailsOrganizerFragment"
         android:name="com.example.summit.fragments.organizer.EventDetailsOrganizerFragment"
         tools:layout="@layout/fragment_event_details_organizer">
-    <action
-        android:id="@+id/action_eventDetailsOrganizer_to_manageEntrants"
-        app:destination="@id/manageEntrants"/>
+
+        <action
+            android:id="@+id/action_eventDetailsOrganizer_to_manageEntrants"
+            app:destination="@id/ManageEntrantsFragment"/>
 
     </fragment>
 
+    <!-- Manage Entrants -->
     <fragment
-        android:id="@+id/manageEntrants"
+        android:id="@+id/ManageEntrantsFragment"
         android:name="com.example.summit.fragments.organizer.ManageEntrantsFragment"
         tools:layout="@layout/fragment_manage_entrants"/>
 
+    <!-- Organizer Notifications -->
+    <fragment
+        android:id="@+id/NotificationsOrganizerFragment"
+        android:name="com.example.summit.fragments.organizer.NotificationsOrganizerFragment"
+        tools:layout="@layout/fragment_notifications_organizer"/>
+
+    <!-- Organizer Profile -->
+    <fragment
+        android:id="@+id/ProfileOrganizerFragment"
+        android:name="com.example.summit.fragments.organizer.ProfileOrganizerFragment"
+        tools:layout="@layout/fragment_profile_organizer"/>
+
+    <fragment
+        android:id="@+id/EventCreatedFragment"
+        android:name="com.example.summit.fragments.organizer.EventCreatedFragment"
+        tools:layout="@layout/fragment_event_created"/>
+
+    <action
+        android:id="@+id/action_createEvent_to_eventCreated"
+        app:destination="@id/EventCreatedFragment"/>
+
+    <action
+        android:id="@+id/action_eventDetailsOrganizer_to_eventCreated"
+        app:destination="@+id/EventCreatedFragment"/>
+
 </navigation>
+

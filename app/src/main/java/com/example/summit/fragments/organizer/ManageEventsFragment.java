@@ -18,6 +18,7 @@ import com.example.summit.adapters.EventAdapter;
 import com.example.summit.model.Event;
 import com.example.summit.model.EventDescription;
 import com.example.summit.session.Session;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,20 +47,26 @@ public class ManageEventsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        FloatingActionButton fab = requireActivity().findViewById(R.id.fab_add_event);
+        fab.setVisibility(View.VISIBLE);
+
 
         recyclerView = view.findViewById(R.id.rv_my_events);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new EventAdapter(getContext(), event -> {
+
             Bundle args = new Bundle();
             args.putString("eventId", event.getId());
 
             // placeholder for future ManageEntrantsFragment
 //            Toast.makeText(getContext(), "Event selected: " + event.getDescription().getTitle(), Toast.LENGTH_SHORT).show();
-            NavHostFragment.findNavController(this).
-                    navigate(R.id.action_eventList_to_eventDetailsOrganizer, args);
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_manageEvents_to_eventDetailsOrganizer, args);
 
-        });
+
+        }
+        );
 
         recyclerView.setAdapter(adapter);
         loadMyEvents();
