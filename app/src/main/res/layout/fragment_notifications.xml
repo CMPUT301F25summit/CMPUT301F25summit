@@ -1,6 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="16dp"
+    tools:context=".fragments.entrant.NotificationsFragment">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <ImageButton
+            android:id="@+id/btn_notifications_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@android:color/white"
+            android:src="@drawable/ic_notification_bell"
+            android:contentDescription="Notifications Icon"
+            app:cornerRadius="20dp"
+            app:backgroundTint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/tv_notifications_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Notifications"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/black" />
+
+        <ImageButton
+            android:id="@+id/btn_settings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_settings_dropdown"
+            android:contentDescription="Settings" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33000000"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tv_your_notifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Notifications"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="12dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/container_notifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/notification_item"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tv_notification_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="You have been selected for the Hackathon 2025 event!"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_notification_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Received: Nov 5, 2025"
+                    android:textColor="#88000000"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/tv_notification_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Edmonton, AB"
+                    android:textColor="#88000000"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

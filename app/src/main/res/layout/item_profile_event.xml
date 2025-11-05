@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground">
+
+    <Button
+        android:id="@+id/img_organizer_initial"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="12dp"
+        android:text='J'
+        app:cornerRadius="32dp"
+        app:backgroundTint="#9C27B0"
+        app:shapeAppearanceOverlay="@style/Widget.Material3.Button.IconButton.Filled"
+        android:background="@drawable/circle_icon"
+        android:padding="12dp"
+        android:contentDescription="Organizer initial" />
+
+    <!-- Event Info -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_event_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hackathon 2025"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_event_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="May 14, 2025"
+            android:textColor="#88000000"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_event_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selected"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:layout_marginStart="8dp" />
+</LinearLayout>
