@@ -38,6 +38,16 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".organizer.EntrantsListActivity"
+            android:exported="false"
+            android:label="Event Entrants" />
+
+        <activity
+            android:name=".organizer.RunLotteryActivity"
+            android:exported="false"
+            android:label="Run Lottery" />
+
     </application>
 
 </manifest>

@@ -15,11 +15,26 @@ import com.example.summit.model.Event;
 import com.example.summit.model.SignUp;
 import com.example.summit.model.Entrant;
 import com.example.summit.session.Session;
+import com.example.summit.organizer.EntrantsListActivity;
+import com.example.summit.organizer.RunLotteryActivity;
 
 /**
  * Fragment for displaying event details.
  * Shows event information and allows entrants to join the waiting list.
- * Organizers can view entrants and run lottery (Task #3 - to be implemented).
+ * Organizers can view entrants and run lottery.
+ *
+ * This fragment can receive an event ID from navigation arguments,
+ * such as when a QR code is scanned (Task #2).
+ *
+ * Features:
+ * - Display event details (Task #1)
+ * - Receive event ID from QR scanner (Task #2)
+ * - Allow entrants to join waiting list
+ * - Organizer buttons: View Entrants & Run Lottery (Task #3)
+ *
+ * @author Summit Team
+ * @version 1.0
+ * @since 2025-11-05
  */
 public class EventDetailsFragment extends Fragment {
 
@@ -74,10 +89,8 @@ public class EventDetailsFragment extends Fragment {
             });
         }
 
-        // ========== TASK #3: ORGANIZER BUTTONS (COMMENTED OUT FOR NOW) ==========
-        // TODO: Uncomment and implement when doing Task #3
+        // ========== TASK #3: ORGANIZER BUTTONS ==========
 
-        /*
         // --- Organizer buttons ---
         Button btnViewEntrants = view.findViewById(R.id.btn_view_entrants);
         Button btnRunLottery = view.findViewById(R.id.btn_run_lottery);
@@ -95,30 +108,38 @@ public class EventDetailsFragment extends Fragment {
 
             // Only enable actions if user is organizer
             if (isOrganizer) {
+                /**
+                 * View Entrants button click handler.
+                 * Opens EntrantsListActivity to show all users who joined this event.
+                 */
                 btnViewEntrants.setOnClickListener(v -> {
-                    // TODO: Create EntrantsListActivity for Task #3
-                    // Intent intent = new Intent(requireContext(), EntrantsListActivity.class);
-                    // intent.putExtra("eventId", eventId);
-                    // startActivity(intent);
-                    Toast.makeText(getContext(), "View Entrants - Coming in Task #3", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), EntrantsListActivity.class);
+                    intent.putExtra("eventId", eventId);
+                    startActivity(intent);
                 });
 
+                /**
+                 * Run Lottery button click handler.
+                 * Opens RunLotteryActivity to randomly select winners from waiting list.
+                 */
                 btnRunLottery.setOnClickListener(v -> {
-                    // TODO: Create RunLotteryActivity for Task #3
-                    // Intent intent = new Intent(requireContext(), RunLotteryActivity.class);
-                    // intent.putExtra("eventId", eventId);
-                    // startActivity(intent);
-                    Toast.makeText(getContext(), "Run Lottery - Coming in Task #3", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), RunLotteryActivity.class);
+                    intent.putExtra("eventId", eventId);
+                    startActivity(intent);
                 });
             }
         }
-        */
         // ========== END OF TASK #3 CODE ==========
     }
 
     /**
      * Loads event details from Firebase using the event ID.
      * TODO: Implement this method to fetch and display event information.
+     *
+     * This method should:
+     * 1. Query Firebase for the event document
+     * 2. Parse the event data
+     * 3. Update UI with event details (title, description, date, location, etc.)
      *
      * @param eventId The unique identifier of the event to load
      */
@@ -129,7 +150,12 @@ public class EventDetailsFragment extends Fragment {
         //     .document(eventId)
         //     .get()
         //     .addOnSuccessListener(doc -> {
-        //         // Display event details in UI
+        //         if (doc.exists()) {
+        //             // Parse and display event details
+        //             String title = doc.getString("title");
+        //             String description = doc.getString("description");
+        //             // ... update UI views
+        //         }
         //     });
     }
 }

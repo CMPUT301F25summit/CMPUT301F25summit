@@ -6,7 +6,7 @@
     android:padding="12dp">
 
     <TextView
-        android:id="@+id/text_name"
+        android:id="@+id/text_view_entrant_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Entrant Name"
@@ -15,12 +15,21 @@
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/text_email"
+        android:id="@+id/text_view_entrant_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="entrant@example.com"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/text_view_entrant_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(123) 456-7890"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>
