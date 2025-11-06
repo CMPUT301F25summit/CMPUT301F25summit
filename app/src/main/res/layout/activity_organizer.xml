@@ -28,12 +28,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="90dp"
+        android:layout_margin="16dp"
         android:contentDescription="Add Event"
-        app:backgroundTint="#7F5CCA"
         app:srcCompat="@drawable/ic_add"
-        app:tint="@android:color/white" />
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

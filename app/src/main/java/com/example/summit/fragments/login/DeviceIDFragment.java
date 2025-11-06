@@ -82,6 +82,7 @@ public class DeviceIDFragment extends Fragment {
                                     } else {
                                         Bundle args = new Bundle();
                                         args.putString("deviceId", deviceId);
+
                                         NavHostFragment.findNavController(DeviceIDFragment.this)
                                                 .navigate(R.id.action_DeviceIDFragment_to_DetailsFragment, args);
                                     }
@@ -89,7 +90,7 @@ public class DeviceIDFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Login failed, try again", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getContext(), "Login failed, try again "+ new String(deviceId), Toast.LENGTH_SHORT).show()
                 );
     }
 
