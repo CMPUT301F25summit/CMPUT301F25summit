@@ -35,7 +35,7 @@
                     app:cornerRadius="32dp"
                     app:backgroundTint="#757575"
                     app:shapeAppearanceOverlay="@style/Widget.Material3.Button.IconButton.Filled"
-                    android:background="@drawable/circle_icon"
+                    android:background="@drawable/ic_circle"
                     android:padding="12dp"
                     android:contentDescription="User initial" />
 
@@ -80,6 +80,7 @@
                 android:layout_marginBottom="16dp">
 
                 <TextView
+                    android:id="@+id/tv_user_phone"
                     android:text="Phone: (123) 456-7890"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
@@ -88,6 +89,7 @@
                     android:layout_marginBottom="4dp" />
 
                 <TextView
+                    android:id="@+id/tv_user_city"
                     android:text="City: Edmonton, AB"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
