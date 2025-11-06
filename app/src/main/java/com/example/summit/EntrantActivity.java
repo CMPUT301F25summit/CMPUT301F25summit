@@ -3,6 +3,7 @@ package com.example.summit;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class EntrantActivity extends AppCompatActivity {
 
+    private String deviceId;
+    private String name, email, phone;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +25,11 @@ public class EntrantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_entrant);
 
         Intent intent = getIntent();
-        String name = intent.getStringExtra("name");
-        String email = intent.getStringExtra("email");
-        String phone = intent.getStringExtra("phone");
+        name = intent.getStringExtra("name");
+        email = intent.getStringExtra("email");
+        phone = intent.getStringExtra("phone");
+
+        deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         if(name != null && !name.isEmpty()) {
             Toast.makeText(this, "Welcome, " + name + "!", Toast.LENGTH_SHORT).show();
@@ -39,6 +45,10 @@ public class EntrantActivity extends AppCompatActivity {
         }
 
 
-
     }
+    public String getDeviceID() {
+        return deviceId;
+    }
+
+
 }

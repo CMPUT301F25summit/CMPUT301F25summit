@@ -21,6 +21,6 @@
         android:id="@+id/notificationsFragment"
         android:name="com.example.summit.fragments.entrant.NotificationsFragment"
         android:label="Notifications"
-        tools:layout="@layout/fragment_notifications"/>
+        tools:layout="@layout/fragment_notifications_entrant"/>
 
 </navigation>
