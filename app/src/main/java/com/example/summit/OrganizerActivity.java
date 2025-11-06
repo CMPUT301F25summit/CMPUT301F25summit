@@ -1,6 +1,8 @@
 package com.example.summit;
 
 import android.os.Bundle;
+import android.provider.Settings;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -11,11 +13,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class OrganizerActivity extends AppCompatActivity {
 
     private NavController navController;
+    private String deviceId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer);
+
+        deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager()
@@ -38,6 +43,10 @@ public class OrganizerActivity extends AppCompatActivity {
                 fab.hide();
             }
         });
+    }
+
+    public String getDeviceID() {
+        return deviceId;
     }
 }
 
