@@ -112,7 +112,7 @@ public class ProfileFragment extends Fragment {
     private void confirmDeleteAccount() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Account")
-                .setMessage("Are you sure you want to delete yout account?")
+                .setMessage("Are you sure you want to delete your account?")
                 .setPositiveButton("Delete", (dialog, which) -> {
             Firebase.deleteEntrant(entrant);
             Intent intent = new Intent(requireContext(), MainActivity.class);

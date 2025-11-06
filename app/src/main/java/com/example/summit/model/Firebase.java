@@ -76,6 +76,14 @@ public class Firebase {
                 .delete()
                 .addOnSuccessListener(a -> Log.d("Firebase", "Entrant deleted"))
                 .addOnFailureListener(e -> Log.e("Firebase", "Error: " + e));
+    }
+
+    public static void deleteOrganizer(Organizer organizer) {
+        db.collection("organizers")
+                .document(organizer.getDeviceId())
+                .delete()
+                .addOnSuccessListener(a -> Log.d("Firebase", "Organizer deleted"))
+                .addOnFailureListener(e -> Log.e("Firebase", "Error: " + e));
 
     }
 
