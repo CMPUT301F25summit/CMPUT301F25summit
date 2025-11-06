@@ -23,6 +23,7 @@ import com.example.summit.session.Session;
 import com.example.summit.utils.QRCodeGenerator;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,6 +137,10 @@ public class CreateEventFragment extends Fragment {
         eventData.put("location", location);
         eventData.put("eventStart", eventStart);
         eventData.put("eventEnd", eventEnd);
+        eventData.put("registeredEntrants", new ArrayList<>());
+        eventData.put("waitingList", new ArrayList<>());
+        eventData.put("declinedEntrants", new ArrayList<>());
+
 
         db.collection("events")
                 .add(eventData)

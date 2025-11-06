@@ -27,12 +27,10 @@ public class OrganizerActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab_add_event);
 
-        // ✅ FAB behavior
         fab.setOnClickListener(v ->
                 navController.navigate(R.id.action_manageEvents_to_createEvent)
         );
 
-        // ✅ FAB visibility control
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.ManageEventsFragment) {
                 fab.show();
