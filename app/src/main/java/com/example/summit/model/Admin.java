@@ -1,12 +1,15 @@
 package com.example.summit.model;
 
 
-//complete implementation
 public class Admin extends User {
-    public Admin() {}
+    public Admin(String name, String email, String deviceId, String phone) {
+        super(name, email, deviceId, phone);
+    }
+
+    public Admin() {} // Empty constructor for Firebase
 
     @Override
     public String getRole() {
-        return "";
+        return "Admin";
     }
 }
