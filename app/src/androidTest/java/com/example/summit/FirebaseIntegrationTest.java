@@ -45,8 +45,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Integration tests for the static Firebase.java utility class.
- * These tests run against the Firebase Local Emulator Suite and do NOT test UI.
- * They run in the `androidTest` source set.
+ * These tests run against the Firebase Local Emulator Suite.
  */
 @RunWith(AndroidJUnit4.class)
 @MediumTest
@@ -84,7 +83,6 @@ public class FirebaseIntegrationTest {
         EventDescription eventDesc2 = new EventDescription();
         eventDesc2.setTitle("Test Event 2");
 
-        // 2. Create a list of all write operations
         List<Task<Void>> tasks = Arrays.asList(
                 db.collection("entrants").document("test-entrant-1").set(entrant1),
                 db.collection("organizers").document("test-organizer-1").set(organizer1),
@@ -136,11 +134,9 @@ public class FirebaseIntegrationTest {
 
     @Test
     public void testSaveEntrant() throws ExecutionException, InterruptedException {
-        // 1. Setup
         Entrant newEntrant = new Entrant("entrant-new");
         newEntrant.setName("New Guy");
-
-        // 2. Action
+        
         Firebase.saveEntrant(newEntrant);
 
         Thread.sleep(500);
