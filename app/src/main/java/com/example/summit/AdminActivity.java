@@ -11,8 +11,30 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * Main activity for the administrator role.
+ * <p>
+ * Provides the admin dashboard with bottom navigation to access:
+ * - Events management (viewing and deleting events)
+ * - User profiles management (placeholder)
+ * - Image settings (placeholder)
+ * - Organizers management (placeholder)
+ * - Notifications (placeholder)
+ * <p>
+ * Uses Navigation Component with nav_graph_admin for fragment navigation.
+ */
 public class AdminActivity extends AppCompatActivity {
 
+    /**
+     * Initializes the admin dashboard activity.
+     * <p>
+     * Sets up:
+     * - Content view with navigation host and bottom navigation
+     * - Welcome toast with admin's name (if provided via Intent)
+     * - Bottom navigation connected to NavController for fragment switching
+     *
+     * @param savedInstanceState Previous state data if activity is being recreated
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -94,6 +94,16 @@
             android:text="Clear"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Delete"
+            style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:textColor="@android:color/white" />
+
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
@@ -115,16 +125,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="16dp" />
-
-    <!-- Delete Button -->
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Delete Selected Events"
-        android:enabled="false"
-        style="@style/Widget.MaterialComponents.Button"
-        android:backgroundTint="@android:color/holo_red_dark" />
 
 </LinearLayout>
