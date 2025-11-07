@@ -24,8 +24,38 @@ import com.example.summit.model.Organizer;
 import com.example.summit.model.Firebase;
 import com.example.summit.session.Session;
 
+/**
+ * A {@link Fragment} that allows a new user to select their role.
+ *
+ * This fragment is displayed after a user enters their details in {@link DetailsFragment}.
+ * It requires user details (deviceId, name, email, phone) to be passed as navigation arguments.
+ *
+ * Based on the role selected (Entrant, Organizer, or Admin), this fragment:
+ * 1. Creates the appropriate user model object.
+ * 2. Saves the new user object to Firestore using the {@code Firebase} helper.
+ * 3. Stores the user object in the global {@link Session} (for Entrant and Admin).
+ * 4. Navigates the user to their respective main activity ({@link EntrantActivity},
+ * {@link OrganizerActivity}, or {@link AdminActivity}).
+ * 5. Finishes the current (login/setup) activity, removing it from the back stack.
+ */
 public class RoleSelectionFragment extends Fragment {
 
+    /**
+     * Inflates the fragment's view and sets up click listeners for the role selection buttons.
+     *
+     * This method retrieves the user details passed from {@link DetailsFragment}. If the
+     * arguments are missing, it displays an error toast. Otherwise, it configures
+     * each role button (Entrant, Organizer, Admin) to create the user, save them,
+     * and redirect to the correct activity.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state.
+     * @return The View for the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

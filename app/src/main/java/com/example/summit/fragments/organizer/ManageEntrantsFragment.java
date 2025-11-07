@@ -24,6 +24,14 @@ import java.util.Set;
 
 import com.example.summit.model.Entrant;
 
+/**
+ * A {@link Fragment} for an organizer to view a list of all entrants
+ * associated with a specific event.
+ *
+ * This fragment retrieves all entrant IDs from the event's various lists
+ * (waiting, selected, accepted, declined), fetches their details,
+ * and displays them in a {@link RecyclerView} using an {@link EntrantAdapter}.
+ */
 public class ManageEntrantsFragment extends Fragment {
 
     private String eventId;
@@ -34,6 +42,10 @@ public class ManageEntrantsFragment extends Fragment {
         super(R.layout.fragment_manage_entrants);
     }
 
+    /**
+     * Initializes the view, retrieves the eventId, hides the parent FAB,
+     * and sets up the {@link RecyclerView} and {@link EntrantAdapter}.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -56,6 +68,14 @@ public class ManageEntrantsFragment extends Fragment {
         loadEntrants();
     }
 
+    /**
+     * Loads all entrants for the current event.
+     *
+     * Fetches the event document, aggregates all unique entrant IDs from
+     * the 'waitingList', 'selectedList', 'acceptedList', and 'declinedList' fields.
+     * It then fetches each entrant's document from the "entrants" collection
+     * and adds them to the {@link EntrantAdapter}.
+     */
     private void loadEntrants() {
         db.collection("events")
                 .document(eventId)

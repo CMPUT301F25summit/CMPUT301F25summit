@@ -29,6 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@link Fragment} for an organizer to view the detailed dashboard for a specific event.
+ *
+ * This screen displays core event info, entrant list counts (waiting, invited, accepted),
+ * and provides navigation to management tasks (manage entrants, edit event, view QR)
+ * and a key action (run lottery).
+ */
 public class EventDetailsOrganizerFragment extends Fragment {
 
     private TextView titleText, descText, regDatesText, capacityText,
@@ -43,6 +50,11 @@ public class EventDetailsOrganizerFragment extends Fragment {
         super(R.layout.fragment_event_details_organizer);
     }
 
+    /**
+     * Initializes the view, sets up the back button, retrieves the event ID,
+     * and calls helper methods to load data and configure buttons.
+     * Hides the parent activity's FAB.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -68,6 +80,10 @@ public class EventDetailsOrganizerFragment extends Fragment {
         setupButtons();
     }
 
+    /**
+     * Binds all the XML views (TextViews, Buttons, etc.) to their class fields.
+     * @param view The fragment's root view.
+     */
     private void initViews(View view) {
         posterImage = view.findViewById(R.id.image_event_poster);
         titleText = view.findViewById(R.id.text_event_title);
@@ -85,6 +101,10 @@ public class EventDetailsOrganizerFragment extends Fragment {
         btnViewQr = view.findViewById(R.id.button_view_qr);
     }
 
+    /**
+     * Fetches the event document from Firestore using {@code eventId} and
+     * calls {@link #updateUIFromFirestore(DocumentSnapshot)} on success.
+     */
     private void loadEventData() {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(this::updateUIFromFirestore)
@@ -93,6 +113,12 @@ public class EventDetailsOrganizerFragment extends Fragment {
                                 Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Populates the UI fields (TextViews, ImageView) with data from the
+     * fetched Firestore {@link DocumentSnapshot}.
+     *
+     * @param doc The {@link DocumentSnapshot} containing the event data.
+     */
     private void updateUIFromFirestore(DocumentSnapshot doc) {
         if (!doc.exists()) return;
 
@@ -122,11 +148,22 @@ public class EventDetailsOrganizerFragment extends Fragment {
                 .into(posterImage);
     }
 
+    /**
+     * Helper to safely get the size of a list field from a {@link DocumentSnapshot}.
+     *
+     * @param doc The Firestore document.
+     * @param field The name of the array/list field.
+     * @return The size of the list, or 0 if the field is null or missing.
+     */
     private long getCount(DocumentSnapshot doc, String field) {
         return doc.get(field) != null ?
                 ((java.util.List<?>) doc.get(field)).size() : 0;
     }
 
+    /**
+     * Configures click listeners for all primary action buttons
+     * (Manage Entrants, Run Lottery, Edit, View QR).
+     */
     private void setupButtons() {
 
         manageEntrantsBtn.setOnClickListener(v -> {
@@ -157,6 +194,14 @@ public class EventDetailsOrganizerFragment extends Fragment {
 
     }
 
+    /**
+     * Executes the lottery logic.
+     *
+     * Fetches the event, calculates remaining capacity, and samples entrants
+     * from the {@code waitingList}. It then updates Firestore, moving selected
+     * entrants from {@code waitingList} to {@code selectedList}, and triggers
+     * {@link #sendSelectionNotifications(List, String)}.
+     */
     private void runLottery() {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(doc -> {
@@ -212,6 +257,13 @@ public class EventDetailsOrganizerFragment extends Fragment {
                 });
     }
 
+    /**
+     * Creates and saves a new notification document in the "notifications"
+     * collection for each newly invited entrant.
+     *
+     * @param invitedIds List of entrant IDs who were selected.
+     * @param eventTitle The title of the event, for the notification message.
+     */
     private void sendSelectionNotifications(List<String> invitedIds, String eventTitle) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         long timestamp = System.currentTimeMillis();

@@ -25,6 +25,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link Fragment} that displays a list of events created by the current organizer.
+ *
+ * This fragment queries the "events" collection based on the organizer's ID
+ * (from the {@link Session}) and displays them in a {@link RecyclerView}.
+ * It also ensures the "Add Event" FAB is visible.
+ */
 public class ManageEventsFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -35,6 +42,9 @@ public class ManageEventsFragment extends Fragment {
         super(R.layout.fragment_manage_events);
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,6 +54,13 @@ public class ManageEventsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_manage_events, container, false);
     }
 
+    /**
+     * Initializes the view, shows the "Add Event" FAB, and sets up the
+     * {@link RecyclerView} with an {@link EventAdapter}.
+     *
+     * The adapter's click listener navigates to the event details screen
+     * ({@code EventDetailsOrganizerFragment}) for the selected event.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -72,6 +89,12 @@ public class ManageEventsFragment extends Fragment {
         loadMyEvents();
     }
 
+    /**
+     * Fetches all events from Firestore where the "organizerId" matches
+     * the current organizer's ID from the {@link Session}.
+     *
+     * Attaches a snapshot listener to update the list in real-time.
+     */
     private void loadMyEvents() {
         String organizerId = Session.getOrganizer().getDeviceId();
 

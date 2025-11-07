@@ -21,6 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A {@link Fragment} that allows an organizer to send custom notifications.
+ *
+ * The organizer can select one or all of their events, and target specific
+ * groups of entrants (e.g., Waiting, Accepted) within those events.
+ */
 public class NotificationsOrganizerFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -35,6 +41,10 @@ public class NotificationsOrganizerFragment extends Fragment {
         super(R.layout.fragment_notifications_organizer);
     }
 
+    /**
+     * Initializes the UI components, populates the spinners by calling
+     * {@link #setupSpinners()}, and sets the "Send" button's click listener.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         inputMessage = view.findViewById(R.id.input_notification_message);
@@ -46,6 +56,11 @@ public class NotificationsOrganizerFragment extends Fragment {
         btnSend.setOnClickListener(v -> sendNotification());
     }
 
+    /**
+     * Populates the event spinner by fetching the current organizer's events from
+     * Firestore. Populates the target group spinner with a static list of options
+     * (e.g., "All Entrants", "Waiting").
+     */
     private void setupSpinners() {
         String organizerId = Session.getOrganizer().getDeviceId();
 
@@ -76,6 +91,14 @@ public class NotificationsOrganizerFragment extends Fragment {
         spinnerGroup.setAdapter(groupAdapter);
     }
 
+    /**
+     * Sends the notification based on the UI selections.
+     *
+     * Gathers the message and target selections. Fetches the target event(s)
+     * and determines the recipient list based on the selected group
+     * (e.g., "waitingList"). Creates a new document in the "notifications"
+     * collection for each recipient.
+     */
     private void sendNotification() {
         String message = inputMessage.getText().toString().trim();
         if (message.isEmpty()) {

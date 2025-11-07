@@ -18,11 +18,32 @@ import com.example.summit.model.Entrant;
 import com.example.summit.model.Firebase;
 import com.example.summit.model.User;
 
+/**
+ * A {@link Fragment} that displays a form for the user to enter their personal details.
+ * <p>
+ * This fragment collects the user's name, email, and phone number.
+ * Upon submission, it validates the required fields (name and email),
+ * retrieves the unique device ID, and passes all details to the
+ * {@code RoleSelectionFragment} via navigation arguments.
+ */
 public class DetailsFragment extends Fragment {
     private EditText inputName, inputEmail, inputPhone;
     private Button submitButton;
     private boolean fields_filled;
 
+    /**
+     * Inflates the fragment's view, initializes UI components, and sets up event listeners.
+     * It also sets the title of the {@link androidx.appcompat.app.ActionBar} if available.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to. The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given in this Bundle.
+     * @return Returns the View for the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,6 +67,17 @@ public class DetailsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Handles the logic when the submit button is clicked.
+     *
+     * It performs the following actions:
+     * 1. Retrieves and trims the input from the name, email, and phone fields.
+     * 2. Validates that the name and email fields are not empty. Shows a Toast if they are.
+     * 3. Retrieves the device's secure {@link Settings.Secure#ANDROID_ID}.
+     * 4. Bundles the device ID, name, email, and phone number.
+     * 5. Navigates to the {@code RoleSelectionFragment} (via action
+     * {@code R.id.action_DetailsFragment_to_RoleSelectionFragment}), passing the bundle as arguments.
+     */
     private void handleSubmit() {
         String name = inputName.getText().toString().trim();
         String email = inputEmail.getText().toString().trim();
