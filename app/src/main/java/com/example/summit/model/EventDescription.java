@@ -19,7 +19,6 @@ public class EventDescription {
     private List<String> selectedList;
     private List<String> acceptedList;
     private List<String> declinedList;
-    private String organizerId;
     private String location;
     private Long capacity;
     private String eventStart;
@@ -95,8 +94,6 @@ public class EventDescription {
     public String getPosterUrl() { return posterUrl; }
     public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
-    public String getOrganizerId() { return organizerId; }
-    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
