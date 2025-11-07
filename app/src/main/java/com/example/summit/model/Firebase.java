@@ -93,15 +93,20 @@ public class Firebase {
         db.collection("events")
                 .get()
                 .addOnSuccessListener(query -> {
-                    List<EventDescription> result = new ArrayList<>();
+                    List<Event> result = new ArrayList<>();
                     for (com.google.firebase.firestore.DocumentSnapshot doc : query.getDocuments()) {
                         EventDescription desc = doc.toObject(EventDescription.class);
-                        if (desc != null) result.add(desc);
+                        if (desc != null) {
+                            Event event = new Event(desc);
+                            event.setId(doc.getId());   // ✅ attach Firestore ID
+                            result.add(event);
+                        }
                     }
                     callback.onEventsLoaded(result);
                 })
                 .addOnFailureListener(e ->
                         Log.e("Firebase", "Error loading events: " + e));
     }
+
 
 }

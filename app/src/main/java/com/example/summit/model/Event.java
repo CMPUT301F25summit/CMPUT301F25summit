@@ -23,6 +23,7 @@ public class Event {
         this.registeredEntrants = new ArrayList<>();
         this.waitingList = new ArrayList<>();
         this.declinedEntrants = new ArrayList<>();
+
     }
 
     public String getId() { return id; }
