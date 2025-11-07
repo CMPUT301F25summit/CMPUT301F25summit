@@ -45,8 +45,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Integration tests for the static Firebase.java utility class.
- * These tests run against the Firebase Local Emulator Suite and do NOT test UI.
- * They run in the `androidTest` source set.
+ * These tests run against the Firebase Local Emulator Suite.
  */
 @RunWith(AndroidJUnit4.class)
 @MediumTest
