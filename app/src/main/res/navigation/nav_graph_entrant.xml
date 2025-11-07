@@ -9,7 +9,12 @@
         android:id="@+id/searchForEventsFragment"
         android:name="com.example.summit.fragments.entrant.SearchForEventsFragment"
         android:label="Search For Events"
-        tools:layout="@layout/fragment_searchforevents"/>
+        tools:layout="@layout/fragment_searchforevents">
+    <action
+        android:id="@+id/action_SearchForEventsFragment_to_EventDetailsEntrantFragment"
+        app:destination="@id/EventDetailsEntrantFragment" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/profileFragment"
@@ -22,5 +27,10 @@
         android:name="com.example.summit.fragments.entrant.NotificationsFragment"
         android:label="Notifications"
         tools:layout="@layout/fragment_notifications_entrant"/>
+
+    <fragment
+        android:id="@+id/EventDetailsEntrantFragment"
+        android:name="com.example.summit.fragments.entrant.EventDetailsEntrantFragment"
+        tools:layout="@layout/fragment_event_details_entrant" />
 
 </navigation>

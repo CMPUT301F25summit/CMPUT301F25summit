@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.summit.R;
@@ -38,9 +39,10 @@ public class SearchForEventsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         adapter = new EventAdapter(requireContext(), event -> {
-            Toast.makeText(requireContext(),
-            "Clicked on " + event.getDescription().getTitle(),
-            Toast.LENGTH_SHORT).show();
+            Bundle args = new Bundle();
+            args.putString("eventId", event.getId());
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_SearchForEventsFragment_to_EventDetailsEntrantFragment, args);
 
             // later need to navigate to EventDetail frag and pass event.getid()
         });
@@ -57,15 +59,9 @@ public class SearchForEventsFragment extends Fragment {
     }
 
     private void loadEvents() {
-        Firebase.loadEvents(descriptions -> {
-            eventList.clear();
-
-            for(EventDescription desc : descriptions) {
-                eventList.add(new Event(desc));
-            }
-
-            adapter.updateEvents(eventList);
-            // may need to implement check for empty list
+        Firebase.loadEvents(events -> {
+            adapter.updateEvents(events);
         });
     }
+
 }
