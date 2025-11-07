@@ -21,6 +21,21 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+/**
+ * Entrant Notifications Fragment for EntrantActivity.
+ * <purpose>
+ * This fragment belongs solely to the EntrantActivity clsss.
+ * The user can navigate to this fragment through the entrant_bottom_nav toolbar.
+ * Upon navigation:
+ *  - provides a list of the entrants notifications in a list format with
+ * each list item containing information about the notification
+ * - As of right now the items are not clickable (notification items), a user should be able
+ * to delete and star notifications. They should also be able to accept/decline selection invites
+ * from organizers.
+ * <p>
+ * Uses Navigation Component with nav_graph_admin for fragment navigation.
+ */
+
 public class NotificationsFragment extends Fragment {
 
     private FirebaseFirestore db;

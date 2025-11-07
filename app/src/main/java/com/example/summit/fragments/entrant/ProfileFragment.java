@@ -19,7 +19,27 @@ import com.example.summit.model.Entrant;
 import com.example.summit.model.Firebase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-// Need to implement button listeners (edit, delete) as well as
+
+/**
+ * Profile Fragment for EntrantActivity.
+ * <purpose>
+ * This fragment belongs solely to the EntrantActivity clsss.
+ * The user can navigate to this fragment through the entrant_bottom_nav toolbar.
+ * Upon navigation:
+ *  - provides a layout view of the users profile (their details, edit/delete account options)
+ *  - pulls entrants data from the database by referencing the device id
+ *  - we pull the actual entrant object from the EntrantActivity class in order to get its deviceID.
+ *  - Entrants can delete their account, upon confirmation it will be removed from the database and user
+ *  will be redirected to the login page
+ *  - Entrant may also edit their personal information using the edit button in which they must also confirm
+ *  any changes before it is saved to the database.
+ *
+ *  -- Currently Missing
+ *  - Entrants should enter their city as a field when logging in or signing up.
+ *  - Entrants do not yet have a getCity() method or city attribute to pull data from. It must be hardcoded as of now
+ *  - this fragment should have a list of the entrants previous events. Entrants should have a list attribute of all their
+ *  previous/active events
+ */
 // array adapter for users previous events.
 // each item should be clickable. If user selects edit, and commits changes
 // firebase console should be updated at the same time. same for delete. Except user should be thrown

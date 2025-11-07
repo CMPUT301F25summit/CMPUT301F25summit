@@ -17,6 +17,8 @@ import com.example.summit.session.Session;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
+
 public class EventDetailsEntrantFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
