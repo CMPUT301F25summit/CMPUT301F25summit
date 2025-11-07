@@ -34,6 +34,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Fragment for managing events in the admin dashboard.
+ * <p>
+ * This fragment provides administrators with comprehensive event management capabilities including:
+ * - Viewing all events in the system with real-time updates
+ * - Searching events by ID or title
+ * - Sorting events by multiple criteria (ID, title, date)
+ * - Selecting single or multiple events for batch operations
+ * - Deleting selected events with confirmation
+ * <p>
+ * The fragment maintains two lists: allEvents (complete dataset) and filteredEvents (after search/filter).
+ * Event deletion removes both the event document and its associated QR code from Firestore.
+ */
 public class AdminEventsFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -50,6 +63,14 @@ public class AdminEventsFragment extends Fragment {
     private List<Event> allEvents = new ArrayList<>();
     private List<Event> filteredEvents = new ArrayList<>();
 
+    /**
+     * Creates and returns the view hierarchy associated with the fragment.
+     *
+     * @param inflater The LayoutInflater object to inflate views
+     * @param container The parent view that the fragment's UI should be attached to
+     * @param savedInstanceState Previous state data if the fragment is being re-created
+     * @return The root View for the fragment's UI
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,6 +79,19 @@ public class AdminEventsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_admin_events, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView() has returned. Initializes all UI components.
+     * <p>
+     * Sets up:
+     * - RecyclerView with LinearLayoutManager and AdminEventAdapter
+     * - Search bar with real-time text filtering
+     * - Filter and sort spinners with array adapters
+     * - Selection buttons (Select All, Clear, Delete)
+     * - Firestore listener for real-time event updates
+     *
+     * @param view The View returned by onCreateView()
+     * @param savedInstanceState Previous state data if the fragment is being re-created
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -75,6 +109,7 @@ public class AdminEventsFragment extends Fragment {
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new AdminEventAdapter(getContext());
+        adapter.setOnSelectionChangedListener(() -> updateSelectionUI());
         recyclerView.setAdapter(adapter);
 
         // Setup filter spinner
@@ -102,6 +137,19 @@ public class AdminEventsFragment extends Fragment {
         loadAllEvents();
     }
 
+    /**
+     * Sets up all event listeners for UI components.
+     * <p>
+     * Configures listeners for:
+     * - Search bar (TextWatcher for real-time filtering)
+     * - Filter spinner (OnItemSelectedListener for filter changes)
+     * - Sort spinner (OnItemSelectedListener for sort changes)
+     * - Select All button (bulk selection)
+     * - Clear Selection button (deselect all)
+     * - Delete button (shows confirmation dialog)
+     * <p>
+     * All filter/sort changes trigger applyFiltersAndSort() to update the display.
+     */
     private void setupListeners() {
         // Search listener
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -155,6 +203,16 @@ public class AdminEventsFragment extends Fragment {
         deleteButton.setOnClickListener(v -> showDeleteConfirmationDialog());
     }
 
+    /**
+     * Loads all events from Firestore using a real-time listener.
+     * <p>
+     * Sets up a SnapshotListener on the "events" collection that automatically
+     * updates the UI whenever events are added, modified, or deleted in the database.
+     * Each event document is deserialized into an EventDescription object and wrapped
+     * in an Event object with its Firestore document ID.
+     * <p>
+     * After loading, automatically applies current filters and sorting via applyFiltersAndSort().
+     */
     private void loadAllEvents() {
         db.collection("events")
                 .addSnapshotListener((value, error) -> {
@@ -176,6 +234,20 @@ public class AdminEventsFragment extends Fragment {
                 });
     }
 
+    /**
+     * Applies current search, filter, and sort criteria to the event list.
+     * <p>
+     * Processing order:
+     * 1. Search filtering - Matches search query against event ID and title (case-insensitive)
+     * 2. Sorting - Applies selected sort option:
+     *    - Event ID (alphabetical)
+     *    - Title (A-Z, case-insensitive)
+     *    - Date (Oldest First or Newest First)
+     * 3. Updates adapter with filtered/sorted results
+     * 4. Updates selection UI to reflect current state
+     * <p>
+     * Called automatically on search text changes, filter changes, sort changes, and after loading events.
+     */
     private void applyFiltersAndSort() {
         String searchQuery = searchEditText.getText() != null ?
                 searchEditText.getText().toString().toLowerCase().trim() : "";
@@ -236,12 +308,27 @@ public class AdminEventsFragment extends Fragment {
         updateSelectionUI();
     }
 
+    /**
+     * Updates the selection UI elements to reflect the current selection state.
+     * <p>
+     * Updates the selected count text view to display the number of currently
+     * selected events (e.g., "3 selected").
+     */
     private void updateSelectionUI() {
         int selectedCount = adapter.getSelectedCount();
         selectedCountText.setText(selectedCount + " selected");
-        deleteButton.setEnabled(selectedCount > 0);
     }
 
+    /**
+     * Shows a confirmation dialog before deleting selected events.
+     * <p>
+     * If no events are selected, displays a toast message. Otherwise, shows an
+     * AlertDialog with:
+     * - Title: "Confirm Deletion"
+     * - Message: Number of events to be deleted and warning that action cannot be undone
+     * - Positive button: "Delete" - Proceeds with deletion via deleteSelectedEvents()
+     * - Negative button: "Cancel" - Dismisses dialog without action
+     */
     private void showDeleteConfirmationDialog() {
         Set<String> selectedIds = adapter.getSelectedEventIds();
         int count = selectedIds.size();
@@ -260,24 +347,36 @@ public class AdminEventsFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Deletes the selected events from Firestore.
+     * <p>
+     * Calls Firebase.deleteEvents() which performs the following:
+     * - Deletes each event document from the "events" collection
+     * - Deletes each associated QR code from the "qrcodes" collection
+     * <p>
+     * On success:
+     * - Clears the adapter selection
+     * - Updates the selection UI
+     * - Shows success toast message
+     * <p>
+     * On failure:
+     * - Shows error toast with failure message
+     *
+     * @param eventIds Set of event IDs to delete
+     */
     private void deleteSelectedEvents(Set<String> eventIds) {
-        // TODO: Implement actual deletion when Firebase.deleteEvents() is ready
-        Toast.makeText(getContext(),
-                "Delete functionality will be implemented when Firebase deletion methods are ready",
-                Toast.LENGTH_LONG).show();
+        com.example.summit.model.Firebase.deleteEvents(new ArrayList<>(eventIds), new com.example.summit.interfaces.DeleteCallback() {
+            @Override
+            public void onDeleteSuccess() {
+                adapter.clearSelection();
+                updateSelectionUI();
+                Toast.makeText(getContext(), "Events deleted successfully", Toast.LENGTH_SHORT).show();
+            }
 
-        // Placeholder for future implementation:
-        // Firebase.deleteEvents(new ArrayList<>(eventIds), new DeleteCallback() {
-        //     @Override
-        //     public void onDeleteSuccess() {
-        //         adapter.clearSelection();
-        //         Toast.makeText(getContext(), "Events deleted successfully", Toast.LENGTH_SHORT).show();
-        //     }
-        //
-        //     @Override
-        //     public void onDeleteFailure(String error) {
-        //         Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
-        //     }
-        // });
+            @Override
+            public void onDeleteFailure(String error) {
+                Toast.makeText(getContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

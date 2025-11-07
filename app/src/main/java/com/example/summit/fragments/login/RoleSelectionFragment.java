@@ -64,12 +64,18 @@ public class RoleSelectionFragment extends Fragment {
             requireActivity().finish();
         });
 
+        // Admin role selection: Creates admin user, saves to Firestore, stores in session,
+        // and navigates to AdminActivity with user details for display
         adminBtn.setOnClickListener(v -> {
             Admin a = new Admin(name, email, deviceId, phone);
-            //Firebase.saveAdmin(a);
+            Firebase.saveAdmin(a);
             Session.setAdmin(a);
             Toast.makeText(getContext(), "Signed in as Admin!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getActivity(), OrganizerActivity.class));
+            Intent intent = new Intent(getActivity(), AdminActivity.class);
+            intent.putExtra("name", name);
+            intent.putExtra("email", email);
+            intent.putExtra("phone", phone);
+            startActivity(intent);
             requireActivity().finish();
         });
 

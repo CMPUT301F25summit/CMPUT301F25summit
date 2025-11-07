@@ -9,8 +9,22 @@ import androidx.fragment.app.Fragment;
 
 import com.example.summit.R;
 
+/**
+ * Fragment for managing admin notifications.
+ * <p>
+ * This is currently a placeholder fragment showing "Coming Soon" message.
+ * Future functionality will include viewing system notifications and alerts.
+ */
 public class AdminNotificationsFragment extends Fragment {
 
+    /**
+     * Creates and returns the view hierarchy for this fragment.
+     *
+     * @param inflater The LayoutInflater to inflate views
+     * @param container The parent view
+     * @param savedInstanceState Previous state data
+     * @return The root view for the fragment
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin_notifications, container, false);

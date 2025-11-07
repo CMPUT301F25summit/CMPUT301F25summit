@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".EntrantActivity" />
         <activity android:name=".OrganizerActivity"/>
+        <activity android:name=".AdminActivity"/>
     </application>
 
 </manifest>
