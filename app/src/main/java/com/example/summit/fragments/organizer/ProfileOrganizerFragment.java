@@ -34,6 +34,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link Fragment} displaying the current organizer's profile.
+ *
+ * It allows the user to view their details, edit them via a dialog,
+ * or delete their account. Deleting the account also removes all events
+ * created by that organizer.
+ */
 public class ProfileOrganizerFragment extends Fragment {
     private Button editBtn, deleteBtn;
     private Organizer organizer;
@@ -41,6 +48,15 @@ public class ProfileOrganizerFragment extends Fragment {
     private TextView tvName, tvEmail, tvPhone, tvCity;
 
 
+    /**
+     * Initializes the view, loads the organizer's profile data from Firestore,
+     * populates the UI, and sets up listeners for edit and delete buttons.
+     *
+     * @param inflater The LayoutInflater object.
+     * @param container This is the parent view.
+     * @param savedInstanceState If non-null, this fragment is re-constructed.
+     * @return The fragment's view.
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,7 +98,10 @@ public class ProfileOrganizerFragment extends Fragment {
         return view;
     }
 
-
+    /**
+     * Displays an {@link AlertDialog} with fields to edit the organizer's profile.
+     * Saves the updated profile to Firestore on confirmation.
+     */
     private void showEditProfileDialog() {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View dialogView = inflater.inflate(R.layout.dialogue_edit_profile, null);
@@ -115,8 +134,12 @@ public class ProfileOrganizerFragment extends Fragment {
                 .show();
     }
 
-
-
+    /**
+     * Displays a confirmation dialog before deleting the account.
+     *
+     * On confirmation, it deletes all associated events, then deletes the
+     * organizer's document from Firestore, and navigates back to {@link MainActivity}.
+     */
     private void confirmDeleteAccount() {
         OrganizerActivity parent = (OrganizerActivity) requireActivity();
         String deviceId = parent.getDeviceID();
