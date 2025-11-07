@@ -10,11 +10,28 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+/**
+ * Main {@link AppCompatActivity} for the "Organizer" section of the application.
+ *
+ * This activity hosts the organizer's navigation graph (via a {@link NavHostFragment}),
+ * sets up the {@link BottomNavigationView} for top-level navigation,
+ * and manages a {@link FloatingActionButton} for creating new events.
+ * It also retrieves and provides the unique device ID.
+ */
+
 public class OrganizerActivity extends AppCompatActivity {
 
     private NavController navController;
     private String deviceId;
 
+    /**
+     * Initializes the activity, sets the content view, and configures navigation.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     * previously being shut down then this Bundle contains the data it most
+     * recently supplied in {@link #onSaveInstanceState(Bundle)}.
+     * Otherwise it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

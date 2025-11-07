@@ -15,14 +15,34 @@ import com.example.summit.model.SignUp;
 import com.example.summit.session.Session;
 import com.example.summit.model.Entrant;
 
+/**
+ * A {@link Fragment} that displays details for a specific event and allows
+ * the current {@link Entrant} to join it.
+ *
+ * This fragment retrieves the {@code eventId} from navigation arguments
+ * and the {@link Entrant} from the {@link Session}.
+ */
 public class EventDetailsFragment extends Fragment {
 
     private Event event; // Will display event info later
 
+    /**
+     * Constructs the fragment, setting its layout.
+     */
     public EventDetailsFragment() {
         super(R.layout.fragment_event_details);
     }
 
+    /**
+     * Called when the view is created.
+     *
+     * Retrieves the {@code eventId} and current {@link Entrant}. If both are
+     * valid, it sets up the "Join" button listener to register the entrant
+     * for the event.
+     *
+     * @param view The View returned by the fragment's layout inflater.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed.
+     */
     @Nullable
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

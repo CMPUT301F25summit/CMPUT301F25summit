@@ -17,16 +17,30 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Displays a generated QR code after an event is created.
+ *
+ * This fragment receives an {@code eventId}, generates a QR code, displays it,
+ * and uploads the QR code to Firestore. Provides a "Done" button to
+ * navigate back to the event management screen.
+ */
 public class EventCreatedFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ImageView qrView;
     private String eventId;
 
+    /**
+     * Constructs the fragment, setting its layout.
+     */
     public EventCreatedFragment() {
         super(R.layout.fragment_event_created);
     }
 
+    /**
+     * Initializes the view, retrieves the eventId, generates the QR code,
+     * and sets the "Done" button listener.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -44,6 +58,10 @@ public class EventCreatedFragment extends Fragment {
         );
     }
 
+    /**
+     * Generates a QR code from the eventId, displays it in the ImageView,
+     * and saves a Base64 version to the "qrcodes" Firestore collection.
+     */
     private void generateQR() {
         Bitmap qr = QRCodeGenerator.generateQRCode(eventId);
         qrView.setImageBitmap(qr);
