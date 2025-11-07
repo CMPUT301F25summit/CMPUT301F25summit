@@ -19,6 +19,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+/**
+ * Search Events Fragment for EntrantActivity.
+ * <purpose>
+ * This fragment belongs solely to the EntrantActivity clsss.
+ * The user is by default redirected to this fragment upon login but can later navigate to this fragment through the entrant_bottom_nav toolbar.
+ * Upon navigation:
+ *  - provides a list of the Events currently in the database.
+ * each event displays a photo of the event, event title, and event date
+ * - As of right now the items are not clickable (event items), a user should be able
+ * to open an event, and view the events description as well as more details. Entrants should also be given
+ * a choice to enroll in the waitlist of that event if they have not already.
+ *
+ * -- Currently Missing
+ * filter and search functionality. Clickable event items and enrollment of event.
+ */
+
 public class SearchForEventsFragment extends Fragment {
 
     private FirebaseFirestore db;
