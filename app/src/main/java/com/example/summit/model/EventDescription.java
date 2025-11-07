@@ -3,6 +3,8 @@ package com.example.summit.model;
 import java.time.LocalDate;
 
 public class EventDescription {
+    private String id;
+    private String organizerId;
     private String title;
     private String description;
     private String startDate;
@@ -15,7 +17,8 @@ public class EventDescription {
     public EventDescription(String title, String description,
                             String startDate, String endDate,
                             String registrationStart, String registrationEnd,
-                            int maxAttendees, String posterUrl) {
+                            int maxAttendees, String posterUrl,
+                            String organizerId) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -24,6 +27,7 @@ public class EventDescription {
         this.registrationEnd = registrationEnd;
         this.maxAttendees = maxAttendees;
         this.posterUrl = posterUrl;
+        this.organizerId = organizerId;
     }
 
     public EventDescription() {} //for firebase deserialization
@@ -51,4 +55,10 @@ public class EventDescription {
 
     public String getPosterUrl() { return posterUrl; }
     public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+
+    public String getOrganizerId() { return organizerId; }
+    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 }

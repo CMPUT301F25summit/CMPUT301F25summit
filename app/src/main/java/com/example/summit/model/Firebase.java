@@ -106,6 +106,14 @@ public class Firebase {
 
     }
 
+    public static void deleteEvent(Event event) {
+        db.collection("events")
+                .document(event.getId())
+                .delete()
+                .addOnSuccessListener(a -> Log.d("Firebase", "Event deleted"))
+                .addOnFailureListener(e -> Log.e("Firebase", "Error: " + e));
+    }
+
     /**
      * Asynchronously loads all event descriptions from the 'events' collection in Firestore.
      * <p>
@@ -124,9 +132,11 @@ public class Firebase {
                     for (com.google.firebase.firestore.DocumentSnapshot doc : query.getDocuments()) {
                         EventDescription desc = doc.toObject(EventDescription.class);
                         if (desc != null) {
+
                             Event event = new Event(desc);
                             event.setId(doc.getId());   // ✅ attach Firestore ID
                             result.add(event);
+
                         }
                     }
                     callback.onEventsLoaded(result);
