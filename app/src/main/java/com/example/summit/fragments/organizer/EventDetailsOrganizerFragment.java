@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +25,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventDetailsOrganizerFragment extends Fragment {
 
@@ -43,6 +46,13 @@ public class EventDetailsOrganizerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ImageButton backButton = view.findViewById(R.id.button_back);
+        backButton.setOnClickListener(v -> {
+            // Navigate back to Manage Events
+            NavHostFragment.findNavController(EventDetailsOrganizerFragment.this)
+                    .navigate(R.id.action_eventDetailsOrganizer_to_manageEvents);
+        });
+
         FloatingActionButton fab = getActivity().findViewById(R.id.fab_add_event);
         if (fab != null) fab.setVisibility(View.GONE);
 
@@ -170,38 +180,56 @@ public class EventDetailsOrganizerFragment extends Fragment {
                         return;
                     }
 
-                    // ✅ Create temporary WaitingList + Entrant objects to use with LotterySystem
                     WaitingList wl = new WaitingList();
                     for (String entrantId : waitingList) {
-                        wl.addEntrant(new Entrant(entrantId)); // minimal constructor, assuming you have one
+                        wl.addEntrant(new Entrant(entrantId));
                     }
 
                     LotterySystem lottery = new LotterySystem(capacity);
                     List<Entrant> invited = lottery.sampleEntrants(wl, remaining);
 
-                    // Extract entrant IDs from invited Entrant objects
                     List<String> invitedIds = new ArrayList<>();
                     for (Entrant e : invited) {
                         invitedIds.add(e.getDeviceId());
                     }
 
-                    // 🔥 Update Firestore (move from waitingList → selectedList)
                     db.collection("events").document(eventId)
                             .update(
                                     "selectedList", FieldValue.arrayUnion(invitedIds.toArray()),
                                     "waitingList", FieldValue.arrayRemove(invitedIds.toArray())
                             )
-                            .addOnSuccessListener(aVoid ->
-                                    Toast.makeText(getContext(),
-                                            "Lottery run successfully! " + invitedIds.size() + " entrants selected.",
-                                            Toast.LENGTH_SHORT).show()
-                            )
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(),
+                                        "Lottery run successfully! " + invitedIds.size() + " entrants selected.",
+                                        Toast.LENGTH_SHORT).show();
+
+                                sendSelectionNotifications(invitedIds, doc.getString("title"));
+                            })
                             .addOnFailureListener(e ->
                                     Toast.makeText(getContext(), "Error updating Firestore: " + e.getMessage(),
                                             Toast.LENGTH_SHORT).show()
                             );
                 });
     }
+
+    private void sendSelectionNotifications(List<String> invitedIds, String eventTitle) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        long timestamp = System.currentTimeMillis();
+
+        for (String entrantId : invitedIds) {
+            Map<String, Object> notif = new HashMap<>();
+            notif.put("entrantId", entrantId);
+            notif.put("eventId", eventId);
+            notif.put("eventTitle", eventTitle);
+            notif.put("message", "You have been selected for \"" + eventTitle + "\"! Please accept or decline.");
+            notif.put("timestamp", timestamp);
+            notif.put("status", "pending");
+
+            db.collection("notifications").add(notif);
+        }
+    }
+
+
 
 }
 

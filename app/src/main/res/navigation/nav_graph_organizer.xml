@@ -45,6 +45,10 @@
             android:id="@+id/action_eventDetailsOrganizer_to_manageEntrants"
             app:destination="@id/ManageEntrantsFragment"/>
 
+        <action
+            android:id="@+id/action_eventDetailsOrganizer_to_manageEvents"
+            app:destination="@id/ManageEventsFragment"/>
+
     </fragment>
 
     <!-- Manage Entrants -->
@@ -77,6 +81,12 @@
     <action
         android:id="@+id/action_eventDetailsOrganizer_to_eventCreated"
         app:destination="@+id/EventCreatedFragment"/>
+
+    <action
+        android:id="@+id/action_createEventFragment_to_manageEvents"
+        app:destination="@id/ManageEventsFragment" />
+
+
 
 </navigation>
 
