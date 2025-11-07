@@ -3,6 +3,7 @@ package com.example.summit.fragments.organizer;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +15,24 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.summit.EntrantActivity;
 import com.example.summit.MainActivity;
 import com.example.summit.OrganizerActivity;
 import com.example.summit.R;
+import com.example.summit.adapters.EventAdapter;
 import com.example.summit.fragments.entrant.ProfileFragment;
 import com.example.summit.model.Entrant;
+import com.example.summit.model.Event;
+import com.example.summit.model.EventDescription;
 import com.example.summit.model.Firebase;
 import com.example.summit.model.Organizer;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileOrganizerFragment extends Fragment {
     private Button editBtn, deleteBtn;
@@ -31,11 +40,12 @@ public class ProfileOrganizerFragment extends Fragment {
     private FirebaseFirestore db;
     private TextView tvName, tvEmail, tvPhone, tvCity;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_organizer_profile, container, false);
         db = FirebaseFirestore.getInstance();
 
         editBtn = view.findViewById(R.id.btn_edit);
@@ -60,11 +70,11 @@ public class ProfileOrganizerFragment extends Fragment {
                             tvCity.setText("City: Calary"); // need get city method
                         }
                     } else {
-                        Toast.makeText(requireContext(), "No Entrant found.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "No Organizer found.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(requireContext(), "Failed to load entrant.", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(requireContext(), "Failed to load organizer.", Toast.LENGTH_SHORT).show());
 
         editBtn.setOnClickListener(v -> showEditProfileDialog());
         deleteBtn.setOnClickListener(v -> confirmDeleteAccount());
@@ -108,15 +118,28 @@ public class ProfileOrganizerFragment extends Fragment {
 
 
     private void confirmDeleteAccount() {
+        OrganizerActivity parent = (OrganizerActivity) requireActivity();
+        String deviceId = parent.getDeviceID();
+
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Account")
                 .setMessage("Are you sure you want to delete your account?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    Firebase.deleteOrganizer(organizer);
-                    Intent intent = new Intent(requireContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    requireActivity().finish();
+                    Firebase.loadEvents(events -> {
+                        for (Event event : events) {
+                            EventDescription desc = event.getDescription();
+                            if (desc.getOrganizerId() != null && desc.getOrganizerId().equals(deviceId))
+                                Firebase.deleteEvent(event);
+                        }
+
+                        Firebase.deleteOrganizer(organizer);
+
+                        Intent intent = new Intent(requireContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        requireActivity().finish();
+                    });
+
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create()
