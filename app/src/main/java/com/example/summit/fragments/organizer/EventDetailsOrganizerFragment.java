@@ -1,6 +1,7 @@
 package com.example.summit.fragments.organizer;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,9 +15,16 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
+import com.example.summit.model.Entrant;
+import com.example.summit.model.LotterySystem;
+import com.example.summit.model.WaitingList;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventDetailsOrganizerFragment extends Fragment {
 
@@ -118,11 +126,10 @@ public class EventDetailsOrganizerFragment extends Fragment {
                     .navigate(R.id.action_eventDetailsOrganizer_to_manageEntrants, args);
         });
 
-        runLotteryBtn.setOnClickListener(v -> {
-            // Placeholder - trigger lottery later
-            Toast.makeText(getContext(), "Lottery feature not implemented yet",
-                    Toast.LENGTH_SHORT).show();
-        });
+
+        runLotteryBtn.setOnClickListener(v -> runLottery());
+
+
 
         editEventBtn.setOnClickListener(v -> {
             Bundle args = new Bundle();
@@ -139,6 +146,63 @@ public class EventDetailsOrganizerFragment extends Fragment {
         });
 
     }
+
+    private void runLottery() {
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) return;
+
+                    // Get event fields
+                    Long capacityLong = doc.getLong("capacity");
+                    List<String> waitingList = (List<String>) doc.get("waitingList");
+                    List<String> selectedList = (List<String>) doc.get("selectedList");
+
+                    if (waitingList == null || waitingList.isEmpty()) {
+                        Toast.makeText(getContext(), "No entrants in waiting list", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int capacity = capacityLong != null ? capacityLong.intValue() : 0;
+                    int remaining = capacity - (selectedList != null ? selectedList.size() : 0);
+
+                    if (remaining <= 0) {
+                        Toast.makeText(getContext(), "Event is already full!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // ✅ Create temporary WaitingList + Entrant objects to use with LotterySystem
+                    WaitingList wl = new WaitingList();
+                    for (String entrantId : waitingList) {
+                        wl.addEntrant(new Entrant(entrantId)); // minimal constructor, assuming you have one
+                    }
+
+                    LotterySystem lottery = new LotterySystem(capacity);
+                    List<Entrant> invited = lottery.sampleEntrants(wl, remaining);
+
+                    // Extract entrant IDs from invited Entrant objects
+                    List<String> invitedIds = new ArrayList<>();
+                    for (Entrant e : invited) {
+                        invitedIds.add(e.getDeviceId());
+                    }
+
+                    // 🔥 Update Firestore (move from waitingList → selectedList)
+                    db.collection("events").document(eventId)
+                            .update(
+                                    "selectedList", FieldValue.arrayUnion(invitedIds.toArray()),
+                                    "waitingList", FieldValue.arrayRemove(invitedIds.toArray())
+                            )
+                            .addOnSuccessListener(aVoid ->
+                                    Toast.makeText(getContext(),
+                                            "Lottery run successfully! " + invitedIds.size() + " entrants selected.",
+                                            Toast.LENGTH_SHORT).show()
+                            )
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Error updating Firestore: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show()
+                            );
+                });
+    }
+
 }
 
 

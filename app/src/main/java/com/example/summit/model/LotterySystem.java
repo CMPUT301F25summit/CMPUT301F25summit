@@ -19,7 +19,12 @@ public class LotterySystem {
 
     public LotterySystem(int totalSpots) {
         this.totalSpots = totalSpots;
+        this.invitedEntrantList = new ArrayList<>();
+        this.acceptedEntrants = new ArrayList<>();
     }
+
+
+
 
     /***
      * Randomly samples entrants from a waiting list

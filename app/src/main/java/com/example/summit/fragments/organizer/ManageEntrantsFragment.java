@@ -18,7 +18,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import com.example.summit.model.Entrant;
 
 public class ManageEntrantsFragment extends Fragment {
@@ -60,7 +63,17 @@ public class ManageEntrantsFragment extends Fragment {
                 .addOnSuccessListener(doc -> {
                     if (!doc.exists()) return;
 
-                    List<String> waitingIds = (List<String>) doc.get("waitingList");
+                    List<String> waitingList = (List<String>) doc.get("waitingList");
+                    List<String> selectedList = (List<String>) doc.get("selectedList");
+                    List<String> acceptedList = (List<String>) doc.get("acceptedList");
+                    List<String> declinedList = (List<String>) doc.get("declinedList");
+
+// Combine all entrants
+                    Set<String> waitingIds = new HashSet<>();
+                    if (waitingList != null) waitingIds.addAll(waitingList);
+                    if (selectedList != null) waitingIds.addAll(selectedList);
+                    if (acceptedList != null) waitingIds.addAll(acceptedList);
+                    if (declinedList != null) waitingIds.addAll(declinedList);
 
                     if (waitingIds == null || waitingIds.isEmpty()) {
                         Toast.makeText(getContext(), "No entrants yet", Toast.LENGTH_SHORT).show();

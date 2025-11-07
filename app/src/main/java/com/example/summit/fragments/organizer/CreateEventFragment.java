@@ -137,9 +137,10 @@ public class CreateEventFragment extends Fragment {
         eventData.put("location", location);
         eventData.put("eventStart", eventStart);
         eventData.put("eventEnd", eventEnd);
-        eventData.put("registeredEntrants", new ArrayList<>());
+        eventData.put("selectedList", new ArrayList<>());
         eventData.put("waitingList", new ArrayList<>());
-        eventData.put("declinedEntrants", new ArrayList<>());
+        eventData.put("declinedList", new ArrayList<>());
+        eventData.put("acceptedList", new ArrayList<>());
 
 
         db.collection("events")

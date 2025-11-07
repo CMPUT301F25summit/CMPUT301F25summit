@@ -9,6 +9,13 @@ public class Entrant extends User {
     }
     public Entrant() {} // TODO: overload for firebase
 
+    public Entrant(String deviceId) { //overload for lottery
+        this.deviceId = deviceId;
+        this.name = "Unknown";
+        this.email = "";
+        this.phone = "";
+    }
+
     @Override
     public String getRole() {
         return "Entrant";
