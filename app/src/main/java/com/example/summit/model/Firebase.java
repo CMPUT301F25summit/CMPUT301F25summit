@@ -1,6 +1,7 @@
 package com.example.summit.model;
 
 import android.util.Log;
+import android.location.Location;
 
 import com.example.summit.interfaces.DeleteCallback;
 import com.example.summit.interfaces.EventLoadCallback;

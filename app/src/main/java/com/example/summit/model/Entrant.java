@@ -1,8 +1,11 @@
 package com.example.summit.model;
 
+import android.location.Location;
+
 public class Entrant extends User {
     private boolean notificationsEnabled;
     private Boolean invitationAccepted;
+    private String location;
     public Entrant (String name, String email, String deviceId, String phone) {
         super (name, email, deviceId, phone);
         this.notificationsEnabled = true; //set to true since entrant allowed to opt-out
@@ -14,6 +17,7 @@ public class Entrant extends User {
         this.name = "Unknown";
         this.email = "";
         this.phone = "";
+        this.location = "";
     }
 
     @Override
@@ -44,6 +48,12 @@ public class Entrant extends User {
 
     public Boolean getInvitationStatus() {
         return invitationAccepted;
+    }
+    public String getCity() {
+        return this.location;
+    }
+    public void setCity(String city) {
+        this.location = city;
     }
 
 
