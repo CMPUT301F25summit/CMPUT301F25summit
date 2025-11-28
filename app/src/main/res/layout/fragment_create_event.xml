@@ -105,6 +105,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"/>
 
+        <CheckBox
+            android:id="@+id/require_location_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Require Location"/>
+
         <Button
             android:id="@+id/button_create_event"
             android:text="Create Event"

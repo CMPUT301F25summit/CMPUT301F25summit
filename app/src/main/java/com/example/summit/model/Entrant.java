@@ -46,4 +46,5 @@ public class Entrant extends User {
         return invitationAccepted;
     }
 
+
 }
