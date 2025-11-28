@@ -86,6 +86,21 @@
         android:id="@+id/action_createEventFragment_to_manageEvents"
         app:destination="@id/ManageEventsFragment" />
 
+    <fragment
+        android:id="@+id/editEventFragment"
+        android:name="com.example.summit.fragments.organizer.EditEventFragment"
+        android:label="Edit Event"
+        tools:layout="@layout/fragment_edit_event">
+        <argument
+            android:name="eventId"
+            app:argType="string" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_eventDetailsOrganizer_to_editEventFragment"
+        app:destination="@+id/editEventFragment" />
+
+
 
 
 </navigation>
