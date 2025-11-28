@@ -79,7 +79,7 @@ public class ProfileFragment extends Fragment {
                                         tvName.setText(entrant.getName());
                                         tvEmail.setText(entrant.getEmail());
                                         tvPhone.setText(entrant.getPhone());
-                                        tvCity.setText("City: Calary"); // need get city method
+                                        tvCity.setText(entrant.getCity()); // need get city method
                                     }
                                 } else {
                                     Toast.makeText(requireContext(), "No Entrant found.", Toast.LENGTH_SHORT).show();
@@ -107,7 +107,7 @@ public class ProfileFragment extends Fragment {
         eName.setText(entrant.getName());
         eEmail.setText(entrant.getEmail());
         ePhone.setText(entrant.getPhone());
-        eCity.setText("calgary"); // entrant.getCity
+        eCity.setText(entrant.getCity());// entrant.getCity
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
@@ -116,7 +116,7 @@ public class ProfileFragment extends Fragment {
                     entrant.setName(eName.getText().toString().trim());
                     entrant.setEmail(eEmail.getText().toString().trim());
                     // entrant.setphone
-                    // entrant.setcity
+                    entrant.setCity(eCity.getText().toString().trim());
 
                     Firebase.saveEntrant(entrant);
 
