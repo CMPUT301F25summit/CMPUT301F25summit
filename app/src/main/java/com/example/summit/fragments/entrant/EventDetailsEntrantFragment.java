@@ -13,7 +13,9 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
+import com.example.summit.model.Entrant;
 import com.example.summit.session.Session;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -59,13 +61,27 @@ public class EventDetailsEntrantFragment extends Fragment {
                 });
 
         joinBtn.setOnClickListener(v -> {
-            String entrantId = Session.getEntrant().getDeviceId();
-            db.collection("events").document(eventId)
-                    .update("waitingList", FieldValue.arrayUnion(entrantId))
-                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(),
-                            "Joined event successfully!", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Toast.makeText(getContext(),
-                            "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            Entrant entrant = Session.getEntrant();
+            String entrantId = entrant.getDeviceId();
+
+            DocumentReference eventRef = db.collection("events").document(eventId);
+
+            eventRef.get().addOnSuccessListener(documentSnapShot -> {
+                boolean isLocationRequired = documentSnapShot.getBoolean("requiredLocation");
+                boolean isEntrantLocationValid = entrant.getLocationShared() && entrant.getLocation() != null;
+
+                if (isLocationRequired && !isEntrantLocationValid) {
+                    Toast.makeText(getContext(), "Please share your location to join this event.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                eventRef.update("waitingList", FieldValue.arrayUnion(entrantId))
+                        .addOnSuccessListener(aVoid -> Toast.makeText(getContext(),
+                                "Joined event successfully!", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Toast.makeText(getContext(),
+                                "Failed to join: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }).addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Could not verify event requirements.", Toast.LENGTH_SHORT).show();
+            });
         });
     }
 }
