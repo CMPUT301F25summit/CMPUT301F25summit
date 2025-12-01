@@ -5,6 +5,16 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        android:contentDescription="Back"
+        android:elevation="6dp"
+        android:src="@drawable/ic_arrow_back" />
+
     <TextView
         android:id="@+id/text_event_title"
         android:layout_height="wrap_content"

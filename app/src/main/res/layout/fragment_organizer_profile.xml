@@ -89,15 +89,6 @@
                     android:layout_marginBottom="4dp" />
 
                 <TextView
-                    android:id="@+id/tv_user_city"
-                    android:text="City: Edmonton, AB"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
                     android:text="Date Joined: May 15, 2024"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
