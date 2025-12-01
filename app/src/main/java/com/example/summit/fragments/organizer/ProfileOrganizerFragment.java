@@ -108,6 +108,7 @@ public class ProfileOrganizerFragment extends Fragment {
         EditText eName = dialogView.findViewById(R.id.et_first_name);
         EditText ePhone = dialogView.findViewById(R.id.et_phone);
         EditText eEmail = dialogView.findViewById(R.id.et_email);
+        EditText eCity = dialogView.findViewById(R.id.et_city);
 
         eName.setText(organizer.getName());
         eEmail.setText(organizer.getEmail());
