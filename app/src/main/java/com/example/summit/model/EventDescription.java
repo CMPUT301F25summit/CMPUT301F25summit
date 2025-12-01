@@ -23,6 +23,7 @@ public class EventDescription {
     private Long capacity;
     private String eventStart;
     private String eventEnd;
+    private Boolean requireLocation = false;
 
     // Getters and setters for these (can stay empty if unused)
     public List<String> getWaitingList() { return waitingList; }
@@ -97,4 +98,8 @@ public class EventDescription {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+
+    public Boolean getRequireLocation() {return requireLocation; }
+    public void setRequiredLocation(Boolean requireLocation) {this.requireLocation = requireLocation; }
+
 }

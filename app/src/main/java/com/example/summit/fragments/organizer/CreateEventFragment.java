@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,8 +40,11 @@ import java.util.Map;
 
 public class CreateEventFragment extends Fragment {
 
-    private EditText titleInput, descInput, capacityInput, regStartInput,
-            regEndInput, locationInput, eventStartInput, eventEndInput;
+   
+    // UI Elements
+    private EditText titleInput, descInput, capacityInput, regStartInput, regEndInput,
+            locationInput, eventStartInput, eventEndInput;
+    private CheckBox requireLocation;
     private ImageView posterImage;
     private Button btnGallery, btnCamera, btnCreate;
 
@@ -85,6 +90,7 @@ public class CreateEventFragment extends Fragment {
         btnGallery = view.findViewById(R.id.btn_select_poster);
         btnCamera = view.findViewById(R.id.btn_take_photo);
         btnCreate = view.findViewById(R.id.button_create_event);
+        requireLocation = view.findViewById(R.id.require_location_checkbox);
 
         regStartInput.setOnClickListener(v -> showDatePicker(regStartInput));
         regEndInput.setOnClickListener(v -> showDatePicker(regEndInput));
@@ -179,6 +185,7 @@ public class CreateEventFragment extends Fragment {
         String location = locationInput.getText().toString().trim();
         String eventStart = eventStartInput.getText().toString().trim();
         String eventEnd = eventEndInput.getText().toString().trim();
+        Boolean selectedRequiredLocation = requireLocation.isChecked();
 
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(desc) ||
                 TextUtils.isEmpty(cap) || TextUtils.isEmpty(regStart) ||
@@ -206,7 +213,7 @@ public class CreateEventFragment extends Fragment {
         eventData.put("waitingList", new ArrayList<>());
         eventData.put("selectedList", new ArrayList<>());
         eventData.put("acceptedList", new ArrayList<>());
-        eventData.put("declinedList", new ArrayList<>());
+        eventData.put("requiredLocation", selectedRequiredLocation);
 
         db.collection("events")
                 .add(eventData)
