@@ -10,17 +10,21 @@
         android:name="com.example.summit.fragments.entrant.SearchForEventsFragment"
         android:label="Search For Events"
         tools:layout="@layout/fragment_searchforevents">
-    <action
-        android:id="@+id/action_SearchForEventsFragment_to_EventDetailsEntrantFragment"
-        app:destination="@id/EventDetailsEntrantFragment" />
+        <action
+            android:id="@+id/action_SearchForEventsFragment_to_EventDetailsEntrantFragment"
+            app:destination="@id/EventDetailsEntrantFragment" />
     </fragment>
-
 
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.summit.fragments.entrant.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile"/>
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_ProfileFragment_to_EventDetailsEntrantFragment"
+            app:destination="@id/EventDetailsEntrantFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/notificationsFragment"
@@ -32,5 +36,14 @@
         android:id="@+id/EventDetailsEntrantFragment"
         android:name="com.example.summit.fragments.entrant.EventDetailsEntrantFragment"
         tools:layout="@layout/fragment_event_details_entrant" />
+
+    <fragment
+        android:id="@+id/notificationDetailsFragment"
+        android:name="com.example.summit.fragments.entrant.NotificationDetailsFragment"
+        tools:layout="@layout/fragment_notification_details" />
+
+    <action
+        android:id="@+id/action_notificationsFragment_to_notificationDetailsFragment"
+        app:destination="@id/notificationDetailsFragment" />
 
 </navigation>

@@ -11,6 +11,9 @@ public class Entrant extends User {
     private String city;
     private Boolean invitationAccepted;
 
+    private boolean allowAdminNotifications = true;
+    private boolean allowOrganizerNotifications = true;
+
     public Entrant (String name, String email, String deviceId, String phone) {
         super (name, email, deviceId, phone);
         this.notificationsEnabled = true; //set to true since entrant allowed to opt-out
@@ -75,5 +78,21 @@ public class Entrant extends User {
         this.city = city;
     }
 
+    public boolean isAllowAdmin() {
+        return allowAdminNotifications;
+    }
 
+    public boolean isAllowOrganizer() {
+        return allowOrganizerNotifications;
+    }
+
+    public void setAllowAdmin(boolean allow) {
+        this.allowAdminNotifications = allow;
+    }
+
+    public void setAllowOrganizer(boolean allow) {
+        this.allowOrganizerNotifications = allow;
+    }
 }
+
+
