@@ -58,8 +58,9 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.zxing:core:3.5.2")
-
-
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.7.0")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.7.0")
+
 }
