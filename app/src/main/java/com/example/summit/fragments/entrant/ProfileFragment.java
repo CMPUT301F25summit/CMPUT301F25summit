@@ -44,29 +44,18 @@ import java.util.Locale;
 
 
 /**
- * Profile Fragment for EntrantActivity.
- * <purpose>
- * This fragment belongs solely to the EntrantActivity clsss.
- * The user can navigate to this fragment through the entrant_bottom_nav toolbar.
- * Upon navigation:
- *  - provides a layout view of the users profile (their details, edit/delete account options)
- *  - pulls entrants data from the database by referencing the device id
- *  - we pull the actual entrant object from the EntrantActivity class in order to get its deviceID.
- *  - Entrants can delete their account, upon confirmation it will be removed from the database and user
- *  will be redirected to the login page
- *  - Entrant may also edit their personal information using the edit button in which they must also confirm
- *  any changes before it is saved to the database.
- *
- *  -- Currently Missing
- *  - Entrants should enter their city as a field when logging in or signing up.
- *  - Entrants do not yet have a getCity() method or city attribute to pull data from. It must be hardcoded as of now
- *  - this fragment should have a list of the entrants previous events. Entrants should have a list attribute of all their
- *  previous/active events
+ * A {@link Fragment} that displays and manages an Entrant's profile.
+ * <p>
+ * <b>Key Features:</b>
+ * <ul>
+ * <li>Displays personal details (Name, Email, Phone, City).</li>
+ * <li>Allows editing of profile details via a dialog.</li>
+ * <li>Toggle for enabling/disabling location sharing (Geo-location).</li>
+ * <li>Displays a history of events the entrant is involved in (Waitlist, Selected, Declined).</li>
+ * <li>Provides Search and Filter functionality for the event history list.</li>
+ * <li>Allows the user to permanently delete their account.</li>
+ * </ul>
  */
-// array adapter for users previous events.
-// each item should be clickable. If user selects edit, and commits changes
-// firebase console should be updated at the same time. same for delete. Except user should be thrown
-// to the mainactivity(login screen)
 
 public class ProfileFragment extends Fragment {
 
@@ -86,6 +75,14 @@ public class ProfileFragment extends Fragment {
     private List<Event> allUserEvents = new ArrayList<>();
     private List<String> allUserStatuses = new ArrayList<>();
 
+    /**
+     * Inflates the fragment layout, initializes Firebase, and triggers the setup of UI and data loading.
+     *
+     * @param inflater           The LayoutInflater object to inflate views.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState Previous saved state (if any).
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -100,6 +97,12 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Binds all XML views to their respective Java variables.
+     * Also initializes the {@link FusedLocationProviderClient} for location services.
+     *
+     * @param view The root view of the fragment.
+     */
     private void initializeViews(View view) {
         locationToggle = view.findViewById(R.id.location_toggle);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -117,6 +120,10 @@ public class ProfileFragment extends Fragment {
         locationToggle.setEnabled(false);
     }
 
+    /**
+     * Configures the {@link RecyclerView} for displaying the user's event history.
+     * Sets up the {@link EntrantEventAdapter} and defines the click listener to navigate to Event Details.
+     */
     private void setupRecyclerView() {
         recyclerEventHistory.setLayoutManager(new LinearLayoutManager(requireContext()));
         eventAdapter = new EntrantEventAdapter(requireContext(), event -> {
@@ -128,6 +135,10 @@ public class ProfileFragment extends Fragment {
         recyclerEventHistory.setAdapter(eventAdapter);
     }
 
+    /**
+     * Fetches the current user's profile data from Firestore based on their Device ID.
+     * Upon success, it triggers the UI update and loads their event history.
+     */
     private void loadEntrantData() {
         EntrantActivity parent = (EntrantActivity) requireActivity();
         String deviceId = parent.getDeviceID();
@@ -150,6 +161,9 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(requireContext(), "Failed to load entrant.", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Updates the TextViews on the screen with the loaded {@link Entrant} data.
+     */
     private void updateUI() {
         tvName.setText(entrant.getName());
         tvEmail.setText(entrant.getEmail());
@@ -157,6 +171,11 @@ public class ProfileFragment extends Fragment {
         tvCity.setText(entrant.getCity() != null ? entrant.getCity() : "Location not shared");
     }
 
+    /**
+     * Configures the Location Toggle switch.
+     * Sets the initial state based on the user's profile and adds a listener to handle
+     * enabling/disabling location permissions and data saving.
+     */
     private void setupLocationToggle() {
         locationToggle.setEnabled(true);
         locationToggle.setChecked(entrant.getLocationShared());
@@ -175,6 +194,15 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets up click listeners for the main action buttons:
+     * <ul>
+     * <li><b>Edit:</b> Opens the profile edit dialog.</li>
+     * <li><b>Delete:</b> Opens the account deletion confirmation.</li>
+     * <li><b>Search:</b> Filters the event list by keyword using {@link ProfileEventFilterUtil}.</li>
+     * <li><b>Filter:</b> Opens the filter dialog to sort by status.</li>
+     * </ul>
+     */
     private void setupClickListeners() {
         editBtn.setOnClickListener(v -> showEditProfileDialog());
         deleteBtn.setOnClickListener(v -> confirmDeleteAccount());
@@ -208,6 +236,14 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Queries Firestore for all events and filters them locally to find ones associated with this user.
+     * <p>
+     * It checks if the user's Device ID is present in the 'accepted', 'waiting', or 'declined' lists
+     * of any event.
+     *
+     * @param deviceId The unique Device ID of the current user.
+     */
     private void loadUserEvents(String deviceId) {
         db.collection("events").get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -256,6 +292,10 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Checks for location permissions and, if granted, retrieves the device's last known location.
+     * It then reverse-geocodes the coordinates to a City name and saves the data to Firestore.
+     */
     // Location methods remain the same
     private void enableLocationSharing() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -277,6 +317,9 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Disables location sharing by setting the entrant's location and city fields to null in Firestore.
+     */
     private void disableLocationSharing() {
         entrant.setLocationShared(false);
         entrant.setLocation(null);
@@ -285,16 +328,27 @@ public class ProfileFragment extends Fragment {
         Firebase.saveEntrant(entrant);
     }
 
+    /**
+     * Helper method to check if the app currently has ACCESS_FINE_LOCATION permission.
+     * @return true if permission is granted, false otherwise.
+     */
     private boolean hasLocationPermission() {
         return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Requests the ACCESS_FINE_LOCATION permission from the system.
+     */
     private void requestLocationPermission() {
         ActivityCompat.requestPermissions(requireActivity(),
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
 
+    /**
+     * Displays a dialog containing EditText fields for the user to update their Name, Email, Phone, and City.
+     * Upon confirmation, the data is saved to Firestore and the UI is refreshed.
+     */
     private void showEditProfileDialog() {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View dialogView = inflater.inflate(R.layout.dialogue_edit_profile, null);
@@ -328,6 +382,12 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Performs reverse geocoding to determine a City name from latitude/longitude coordinates.
+     *
+     * @param geoPoint The geographic coordinates.
+     * @return A String representing the City (or SubAdminArea), or "Unknown City" if lookup fails.
+     */
     private String getCityFromGeoPoint(GeoPoint geoPoint) {
         if (geoPoint == null) return "Unknown Location";
 
@@ -352,6 +412,10 @@ public class ProfileFragment extends Fragment {
         return "Unknown City";
     }
 
+    /**
+     * Displays a confirmation alert dialog.
+     * If confirmed, the user's entrant document is deleted from Firestore and they are redirected to the Login screen.
+     */
     private void confirmDeleteAccount() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Account")
@@ -368,6 +432,10 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Called when the fragment resumes. Refreshes the user's event list to ensure
+     * status changes (e.g., accepting an invite) are reflected immediately.
+     */
     @Override
     public void onResume() {
         super.onResume();
