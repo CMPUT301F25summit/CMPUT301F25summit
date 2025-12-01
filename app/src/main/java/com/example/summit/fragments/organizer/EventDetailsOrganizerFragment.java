@@ -55,7 +55,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
     private TextView titleText, descText, regDatesText, capacityText,
             waitingCountText, invitedCountText, acceptedCountText;
     private ImageView posterImage;
-    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn, btnViewQr, exportEventBtn;
+    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn, btnViewQr, exportEventBtn, btnViewMap;
     private List<Entrant> entrants;
     private DocumentSnapshot eventSnapshot;
     private String eventId;
@@ -127,6 +127,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
         editEventBtn = view.findViewById(R.id.button_edit_event);
         btnViewQr = view.findViewById(R.id.button_view_qr);
         exportEventBtn = view.findViewById(R.id.button_export_event);
+        btnViewMap = view.findViewById(R.id.button_view_map);
     }
 
     /**
@@ -264,6 +265,13 @@ public class EventDetailsOrganizerFragment extends Fragment {
             args.putString("eventId", eventId);
             NavHostFragment.findNavController(this)
                     .navigate(R.id.action_eventDetailsOrganizer_to_eventCreated, args);
+        });
+
+        btnViewMap.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("EVENT_ID", eventId);
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_eventDetailsOrganizer_to_map, args);
         });
 
         exportEventBtn.setOnClickListener(v -> {
