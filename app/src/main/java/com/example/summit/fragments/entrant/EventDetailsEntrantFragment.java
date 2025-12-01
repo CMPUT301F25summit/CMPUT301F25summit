@@ -1,6 +1,7 @@
 package com.example.summit.fragments.entrant;
 
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -53,10 +54,15 @@ public class EventDetailsEntrantFragment extends Fragment {
                         String end = doc.getString("registrationEnd");
                         dates.setText("Registration: " + start + " - " + end);
 
-                        Glide.with(this)
-                                .load(doc.getString("posterUrl"))
-                                .placeholder(R.drawable.placeholder_event)
-                                .into(poster);
+                        String posterBase64 = doc.getString("posterBase64");
+
+                        if (posterBase64 != null && !posterBase64.isEmpty()) {
+                            byte[] decoded = Base64.decode(posterBase64, Base64.DEFAULT);
+                            Glide.with(this).asBitmap().load(decoded).into(poster);
+                        } else {
+                            poster.setImageResource(R.drawable.placeholder_event);
+                        }
+
                     }
                 });
 

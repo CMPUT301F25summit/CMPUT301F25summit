@@ -1,6 +1,7 @@
 package com.example.summit.adapters;
 
 import android.content.Context;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,10 +138,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                 "Registration: " + desc.getRegistrationStart() + " - " + desc.getRegistrationEnd()
         );
 
-        Glide.with(context)
-                .load(desc.getPosterUrl())
-                .placeholder(R.drawable.placeholder_event)
-                .into(holder.eventPoster);
+        String base64 = event.getDescription().getPosterBase64();
+
+        if (base64 != null && !base64.isEmpty()) {
+            byte[] decoded = Base64.decode(base64, Base64.DEFAULT);
+            Glide.with(context).asBitmap().load(decoded).into(holder.eventPoster);
+        } else {
+            holder.eventPoster.setImageResource(R.drawable.placeholder_event);
+        }
+
 
         holder.itemView.setOnClickListener(v -> listener.onEventClick(event));
     }
