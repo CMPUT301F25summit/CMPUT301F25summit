@@ -1,5 +1,8 @@
 package com.example.summit.fragments.organizer;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -17,13 +22,21 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
+import com.example.summit.model.Event;
+import com.example.summit.model.EventDescription;
 import com.example.summit.model.LotterySystem;
 import com.example.summit.model.WaitingList;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +54,23 @@ public class EventDetailsOrganizerFragment extends Fragment {
     private TextView titleText, descText, regDatesText, capacityText,
             waitingCountText, invitedCountText, acceptedCountText;
     private ImageView posterImage;
-    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn, btnViewQr;
-
+    private Button manageEntrantsBtn, runLotteryBtn, editEventBtn, btnViewQr, exportEventBtn;
+    private List<Entrant> entrants;
+    private DocumentSnapshot eventSnapshot;
     private String eventId;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private String currentCsvContent;
+    private final ActivityResultLauncher<Intent> saveCsvLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri uri = result.getData().getData();
+                    writeTextToUri(uri, currentCsvContent);
+                }
+            }
+    );
 
     public EventDetailsOrganizerFragment() {
         super(R.layout.fragment_event_details_organizer);
@@ -99,6 +125,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
         runLotteryBtn = view.findViewById(R.id.button_run_lottery);
         editEventBtn = view.findViewById(R.id.button_edit_event);
         btnViewQr = view.findViewById(R.id.button_view_qr);
+        exportEventBtn = view.findViewById(R.id.button_export_event);
     }
 
     /**
@@ -107,11 +134,50 @@ public class EventDetailsOrganizerFragment extends Fragment {
      */
     private void loadEventData() {
         db.collection("events").document(eventId).get()
-                .addOnSuccessListener(this::updateUIFromFirestore)
+                .addOnSuccessListener(documentSnapshot -> {
+                    eventSnapshot = documentSnapshot;
+                    updateUIFromFirestore(documentSnapshot);
+                    loadEntrantsFromIds(documentSnapshot);
+                })
                 .addOnFailureListener(error ->
                         Toast.makeText(getContext(), "Load failed: " + error.getMessage(),
                                 Toast.LENGTH_SHORT).show());
     }
+
+    private void loadEntrantsFromIds(DocumentSnapshot eventDoc) {
+        List<String> ids = (List<String>) eventDoc.get("waitingList");
+        ids.addAll((List<String>) eventDoc.get("acceptedList"));
+        ids.addAll((List<String>) eventDoc.get("declinedList"));
+        ids.addAll((List<String>) eventDoc.get("selectedList"));
+
+        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+
+        if (ids == null || ids.isEmpty()) {
+            entrants = new ArrayList<>();
+            return;
+        }
+
+        int chunkSize = 10;
+        for (int i = 0; i < ids.size(); i += chunkSize) {
+            List<String> chunk = ids.subList(i, Math.min(i + chunkSize, ids.size()));
+
+            Task<QuerySnapshot> task = db.collection("entrants")
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get();
+            tasks.add(task);
+        }
+
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+            entrants = new ArrayList<>();
+
+            for (Object obj : results) {
+                QuerySnapshot snapshot = (QuerySnapshot) obj;
+                entrants.addAll(snapshot.toObjects(Entrant.class));
+            }
+        });
+    }
+
+
 
     /**
      * Populates the UI fields (TextViews, ImageView) with data from the
@@ -176,8 +242,6 @@ public class EventDetailsOrganizerFragment extends Fragment {
 
         runLotteryBtn.setOnClickListener(v -> runLottery());
 
-
-
         editEventBtn.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("eventId", eventId);
@@ -192,6 +256,68 @@ public class EventDetailsOrganizerFragment extends Fragment {
                     .navigate(R.id.action_eventDetailsOrganizer_to_eventCreated, args);
         });
 
+        exportEventBtn.setOnClickListener(v -> {
+            if (entrants == null || eventSnapshot == null) {
+                Toast.makeText(getContext(), "Data is still loading...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (entrants.isEmpty()) {
+                Toast.makeText(getContext(), "No entrants to export", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            currentCsvContent = generateCSV(entrants, eventSnapshot);
+
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("text/csv");
+            intent.putExtra(Intent.EXTRA_TITLE, "event_entrants.csv");
+
+            saveCsvLauncher.launch(intent);
+        });
+
+    }
+
+    private static String generateCSV(List<Entrant> entrants, DocumentSnapshot eventDoc) {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Name,Email,Status\n");
+
+        List<String> waiting = eventDoc.get("waitingList") != null ? (List<String>) eventDoc.get("waitingList") : new ArrayList<>();
+        List<String> declined = eventDoc.get("declinedList") != null ? (List<String>) eventDoc.get("declinedList") : new ArrayList<>();
+        List<String> selected = eventDoc.get("selectedList") != null ? (List<String>) eventDoc.get("selectedList") : new ArrayList<>();
+        String status;
+
+        for (Entrant entrant: entrants) {
+            String id = entrant.getDeviceId();
+
+            if (waiting.contains(id)) {
+                status = "Waiting";
+            } else if (declined.contains(id)) {
+                status = "Declined";
+            } else if (selected.contains(id)) {
+                status = "Selected";
+            } else {
+                status = "Accepted";
+            }
+            csv.append(entrant.getName()).append(",");
+            csv.append(entrant.getEmail()).append(",");
+            csv.append(status).append("\n");
+        }
+
+        return csv.toString();
+    }
+
+    private void writeTextToUri(Uri uri, String csvContent) {
+        try {
+            OutputStream outputStream = requireContext().getContentResolver().openOutputStream(uri);
+            if (outputStream != null) {
+                outputStream.write(csvContent.getBytes());
+                outputStream.close();
+                Toast.makeText(getContext(), "Export successful!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "Error saving file", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -280,8 +406,6 @@ public class EventDetailsOrganizerFragment extends Fragment {
             db.collection("notifications").add(notif);
         }
     }
-
-
 
 }
 

@@ -3,6 +3,7 @@ package com.example.summit.fragments.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,9 +146,10 @@ public class DeviceIDFragment extends Fragment {
                                 });
                     }
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Login failed, try again "+ new String(deviceId), Toast.LENGTH_SHORT).show()
-                );
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Error fetching entrant", e);
+                    Toast.makeText(getContext(), "Login failed, try again " + new String(deviceId), Toast.LENGTH_SHORT).show();
+                });
     }
 
 }
