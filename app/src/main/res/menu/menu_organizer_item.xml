@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_view_profile"
+        android:title="View Profile"
+        android:icon="@drawable/ic_profile" />
+    <item
+        android:id="@+id/action_view_notifications"
+        android:title="View Notifications"
+        android:icon="@drawable/ic_notifications" />
+</menu>

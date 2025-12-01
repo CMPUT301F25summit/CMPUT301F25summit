@@ -87,7 +87,7 @@ public class NotificationsOrganizerFragment extends Fragment {
         ArrayAdapter<String> groupAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"All Entrants", "Waiting", "Selected", "Accepted"});
+                new String[] { "All Entrants", "Waiting", "Selected", "Accepted" });
         spinnerGroup.setAdapter(groupAdapter);
     }
 
@@ -147,7 +147,8 @@ public class NotificationsOrganizerFragment extends Fragment {
                                 break;
                         }
 
-                        if (recipients == null || recipients.isEmpty()) continue;
+                        if (recipients == null || recipients.isEmpty())
+                            continue;
 
                         for (String entrantId : recipients) {
                             Map<String, Object> notification = new HashMap<>();
@@ -165,11 +166,7 @@ public class NotificationsOrganizerFragment extends Fragment {
                     Toast.makeText(getContext(), "Notifications sent successfully ✅", Toast.LENGTH_SHORT).show();
                     inputMessage.setText("");
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }
-
-
-
-
