@@ -89,6 +89,7 @@ public class RoleSelectionFragment extends Fragment {
         organizerBtn.setOnClickListener(v -> {
             Organizer o = new Organizer(name, email, deviceId, phone);
             Firebase.saveOrganizer(o);
+            Session.setOrganizer(o);
             Toast.makeText(getContext(), "Signed in as Organizer!", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getActivity(), OrganizerActivity.class));
             requireActivity().finish();
