@@ -1,23 +1,36 @@
 package com.example.summit.fragments.entrant;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import com.example.summit.EntrantActivity;
 import com.example.summit.MainActivity;
 import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Firebase;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -48,6 +61,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ProfileFragment extends Fragment {
 
     private Button editBtn, deleteBtn;
+    private Switch locationToggle;
+    private FusedLocationProviderClient fusedLocationClient;
     private Entrant entrant;
     private FirebaseFirestore db;
     private TextView tvName, tvEmail, tvPhone, tvCity;
@@ -59,6 +74,9 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         db = FirebaseFirestore.getInstance();
 
+        locationToggle = view.findViewById(R.id.location_toggle);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
         editBtn = view.findViewById(R.id.btn_edit);
         deleteBtn = view.findViewById(R.id.btn_delete_account);
         tvName = view.findViewById(R.id.tv_user_name);
@@ -69,6 +87,7 @@ public class ProfileFragment extends Fragment {
         EntrantActivity parent = (EntrantActivity) requireActivity();
         String deviceId = parent.getDeviceID();
 
+        locationToggle.setEnabled(false);
 
        db.collection("entrants").document(deviceId)
                        .get()
@@ -79,7 +98,23 @@ public class ProfileFragment extends Fragment {
                                         tvName.setText(entrant.getName());
                                         tvEmail.setText(entrant.getEmail());
                                         tvPhone.setText(entrant.getPhone());
-                                        tvCity.setText(entrant.getCity()); // need get city method
+                                        tvCity.setText(entrant.getCity() != null ? entrant.getCity() : "Location not shared");
+
+                                        locationToggle.setEnabled(true);
+                                        locationToggle.setChecked(entrant.getLocationShared());
+
+                                        locationToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                                            if (isChecked) {
+                                                if (hasLocationPermission()) {
+                                                    enableLocationSharing();
+                                                } else {
+                                                    requestLocationPermission();
+                                                    locationToggle.setChecked(false);
+                                                }
+                                            } else {
+                                                disableLocationSharing();
+                                            }
+                                        });
                                     }
                                 } else {
                                     Toast.makeText(requireContext(), "No Entrant found.", Toast.LENGTH_SHORT).show();
@@ -92,6 +127,42 @@ public class ProfileFragment extends Fragment {
         deleteBtn.setOnClickListener(v -> confirmDeleteAccount());
 
         return view;
+    }
+
+    private void enableLocationSharing() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            GeoPoint locationPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                            String city = getCityFromGeoPoint(locationPoint);
+                            entrant.setLocation(locationPoint);
+                            entrant.setCity(city);
+                            entrant.setLocationShared(true);
+                            Firebase.saveEntrant(entrant);
+
+                            tvCity.setText(city);
+                        } else {
+                            Toast.makeText(requireContext(), "Turn on GPS device settings", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    private void disableLocationSharing() {
+        entrant.setLocationShared(false);
+        entrant.setLocation(null);
+        entrant.setCity(null);
+        tvCity.setText("Location not shared");
+        Firebase.saveEntrant(entrant);
+    }
+
+    private boolean hasLocationPermission() {
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
 
 
@@ -127,6 +198,30 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
+    private String getCityFromGeoPoint(GeoPoint geoPoint) {
+        if (geoPoint == null) return "Unknown Location";
+
+        Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(
+                    geoPoint.getLatitude(),
+                    geoPoint.getLongitude(),
+                    1
+            );
+
+            if (addresses != null && !addresses.isEmpty()) {
+                String city = addresses.get(0).getLocality();
+
+                if (city == null) {
+                    city = addresses.get(0).getSubAdminArea();
+                }
+                return city;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Unknown City";
+    }
 
 
     private void confirmDeleteAccount() {

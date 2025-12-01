@@ -137,6 +137,12 @@
             </LinearLayout>
 
 
+            <Switch
+                android:id="@+id/location_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="share location" />
+
             <TextView
                 android:id="@+id/tv_my_events_header"
                 android:layout_width="wrap_content"
