@@ -20,6 +20,15 @@
         <item>Date (Oldest First)</item>
         <item>Date (Newest First)</item>
     </string-array>
+
+    <!-- Admin User Profile Filter Options - Role -->
+    <string-array name="user_filter_role_options">
+        <item>All Roles</item>
+        <item>Entrant</item>
+        <item>Organizer</item>
+        <item>Admin</item>
+    </string-array>
+
     <string name="select_event">Select Event</string>
     <string name="select_target_group">Select Target Group</string>
 </resources>
