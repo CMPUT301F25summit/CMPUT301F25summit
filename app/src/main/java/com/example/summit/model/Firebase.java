@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.example.summit.interfaces.DeleteCallback;
 import com.example.summit.interfaces.EventLoadCallback;
+import com.example.summit.interfaces.UserLoadCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -201,6 +202,197 @@ public class Firebase {
                     .addOnFailureListener(e -> {
                         Log.e("Firebase", "Error deleting QR code: " + eventId, e);
                     });
+        }
+    }
+
+    /**
+     * Loads all users from Firestore with real-time updates using SnapshotListeners.
+     * <p>
+     * This method sets up three separate SnapshotListeners on the 'entrants', 'organizers',
+     * and 'admins' collections. The listeners merge results into a unified list of UserProfile
+     * objects and notify the callback whenever any collection changes.
+     *
+     * @param callback The callback to handle loaded users or errors
+     */
+    public static void loadAllUsersRealtime(UserLoadCallback callback) {
+        List<UserProfile> allUsers = new ArrayList<>();
+        AtomicInteger loadedCollections = new AtomicInteger(0);
+
+        // Listener for Entrants collection
+        db.collection("entrants").addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firebase", "Error loading entrants: " + error);
+                callback.onLoadFailure("Error loading entrants: " + error.getMessage());
+                return;
+            }
+
+            synchronized (allUsers) {
+                // Remove old entrants from the list
+                allUsers.removeIf(u -> "Entrant".equals(u.getRole()));
+
+                // Add current entrants
+                if (value != null) {
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        Entrant entrant = doc.toObject(Entrant.class);
+                        if (entrant != null) {
+                            allUsers.add(new UserProfile(entrant));
+                        }
+                    }
+                }
+
+                // Notify callback if all collections have loaded at least once
+                if (loadedCollections.incrementAndGet() >= 3) {
+                    callback.onUsersLoaded(new ArrayList<>(allUsers));
+                } else if (loadedCollections.get() == 3) {
+                    // Subsequent updates after initial load
+                    callback.onUsersLoaded(new ArrayList<>(allUsers));
+                }
+            }
+        });
+
+        // Reset counter for tracking
+        loadedCollections.set(0);
+
+        // Listener for Organizers collection
+        db.collection("organizers").addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firebase", "Error loading organizers: " + error);
+                callback.onLoadFailure("Error loading organizers: " + error.getMessage());
+                return;
+            }
+
+            synchronized (allUsers) {
+                // Remove old organizers from the list
+                allUsers.removeIf(u -> "Organizer".equals(u.getRole()));
+
+                // Add current organizers
+                if (value != null) {
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        Organizer organizer = doc.toObject(Organizer.class);
+                        if (organizer != null) {
+                            allUsers.add(new UserProfile(organizer));
+                        }
+                    }
+                }
+
+                loadedCollections.incrementAndGet();
+                callback.onUsersLoaded(new ArrayList<>(allUsers));
+            }
+        });
+
+        // Listener for Admins collection
+        db.collection("admins").addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firebase", "Error loading admins: " + error);
+                callback.onLoadFailure("Error loading admins: " + error.getMessage());
+                return;
+            }
+
+            synchronized (allUsers) {
+                // Remove old admins from the list
+                allUsers.removeIf(u -> "Admin".equals(u.getRole()));
+
+                // Add current admins
+                if (value != null) {
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        Admin admin = doc.toObject(Admin.class);
+                        if (admin != null) {
+                            allUsers.add(new UserProfile(admin));
+                        }
+                    }
+                }
+
+                loadedCollections.incrementAndGet();
+                callback.onUsersLoaded(new ArrayList<>(allUsers));
+            }
+        });
+    }
+
+    /**
+     * Deletes a single user from the appropriate Firestore collection based on their role.
+     *
+     * @param userProfile The UserProfile containing the user to delete
+     * @param callback The callback to handle success or failure
+     */
+    public static void deleteUser(UserProfile userProfile, DeleteCallback callback) {
+        String collection = getCollectionForRole(userProfile.getRole());
+        String deviceId = userProfile.getDeviceId();
+
+        db.collection(collection)
+                .document(deviceId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "User deleted: " + deviceId + " from " + collection);
+                    callback.onDeleteSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error deleting user: " + deviceId, e);
+                    callback.onDeleteFailure("Error deleting user: " + e.getMessage());
+                });
+    }
+
+    /**
+     * Deletes multiple users from their respective Firestore collections.
+     * <p>
+     * This method deletes users based on their roles, routing each deletion
+     * to the appropriate collection ('entrants', 'organizers', or 'admins').
+     * It tracks deletion progress and invokes the callback when all deletions
+     * are complete or if errors occur.
+     *
+     * @param userProfiles List of UserProfiles to delete
+     * @param callback The callback to handle success or failure
+     */
+    public static void deleteUsers(List<UserProfile> userProfiles, DeleteCallback callback) {
+        if (userProfiles == null || userProfiles.isEmpty()) {
+            callback.onDeleteFailure("No users to delete");
+            return;
+        }
+
+        AtomicInteger pendingDeletions = new AtomicInteger(userProfiles.size());
+        AtomicInteger failureCount = new AtomicInteger(0);
+
+        for (UserProfile userProfile : userProfiles) {
+            deleteUser(userProfile, new DeleteCallback() {
+                @Override
+                public void onDeleteSuccess() {
+                    if (pendingDeletions.decrementAndGet() == 0) {
+                        if (failureCount.get() == 0) {
+                            callback.onDeleteSuccess();
+                        } else {
+                            callback.onDeleteFailure(failureCount.get() + " deletion(s) failed");
+                        }
+                    }
+                }
+
+                @Override
+                public void onDeleteFailure(String error) {
+                    Log.e("Firebase", "Deletion failed: " + error);
+                    failureCount.incrementAndGet();
+                    if (pendingDeletions.decrementAndGet() == 0) {
+                        callback.onDeleteFailure(failureCount.get() + " deletion(s) failed");
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Helper method to determine the Firestore collection name for a given user role.
+     *
+     * @param role The user role ("Entrant", "Organizer", or "Admin")
+     * @return The collection name ("entrants", "organizers", or "admins")
+     * @throws IllegalArgumentException if the role is not recognized
+     */
+    private static String getCollectionForRole(String role) {
+        switch (role) {
+            case "Entrant":
+                return "entrants";
+            case "Organizer":
+                return "organizers";
+            case "Admin":
+                return "admins";
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
         }
     }
 

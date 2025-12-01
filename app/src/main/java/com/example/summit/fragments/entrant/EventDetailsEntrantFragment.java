@@ -2,6 +2,7 @@ package com.example.summit.fragments.entrant;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -16,9 +17,12 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
+
 import com.example.summit.model.Event;
 import com.example.summit.model.EventDescription;
+import com.example.summit.model.Entrant;
 import com.example.summit.session.Session;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -65,6 +69,7 @@ public class EventDetailsEntrantFragment extends Fragment {
                                   TextView dates, ImageView poster) {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(doc -> {
+
                     if (!doc.exists()) return;
 
                     currentEvent = new Event();
@@ -72,7 +77,7 @@ public class EventDetailsEntrantFragment extends Fragment {
 
                     // Build EventDescription manually
                     EventDescription d = new EventDescription();
-                    d.setTitle("Event"); // no title field exists, so set default
+                    d.setTitle(doc.getString("title"));
                     d.setDescription(doc.getString("description"));
                     d.setLocation(doc.getString("location"));
                     d.setCapacity(doc.getLong("capacity"));
@@ -161,26 +166,39 @@ public class EventDetailsEntrantFragment extends Fragment {
         }
     }
 
-    private void joinEvent() {
-        String entrantId = Session.getEntrant().getDeviceId();
+     private void joinEvent() {
+        Entrant entrant = Session.getEntrant();
+        String entrantId = entrant.getDeviceId();
 
-        db.collection("events").document(eventId)
-                .update("waitingList", FieldValue.arrayUnion(entrantId))
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(),
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        eventRef.get().addOnSuccessListener(document -> {
+
+            boolean isLocationRequired = Boolean.TRUE.equals(document.getBoolean("requiredLocation"));
+            boolean entrantLocationValid =
+                    entrant.getLocationShared() && entrant.getLocation() != null;
+
+            // ADD: geolocation validation (from main)
+            if (isLocationRequired && !entrantLocationValid) {
+                Toast.makeText(getContext(),
+                        "This event requires your location. Please enable location sharing.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            eventRef.update("waitingList", FieldValue.arrayUnion(entrantId))
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(),
                                 "Joined waitlist successfully!", Toast.LENGTH_SHORT).show();
 
-                    if (currentEvent.getWaitingList() == null)
-                        currentEvent.setWaitingList(new ArrayList<>());
+                        if (currentEvent.getWaitingList() == null) currentEvent.setWaitingList(new ArrayList<>());
 
-                    currentEvent.getWaitingList().add(entrantId);
-
-                    updateButtonState();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(getContext(),
-                                "Failed: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show());
+                        currentEvent.getWaitingList().add(entrantId);
+                        updateButtonState();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getContext(),
+                                    "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
     }
 }
-

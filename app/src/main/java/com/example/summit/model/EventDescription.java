@@ -25,6 +25,12 @@ public class EventDescription {
     private String eventEnd;
     private Boolean requireLocation = false;
 
+    private String posterBase64;
+
+    public String getPosterBase64() { return posterBase64; }
+    public void setPosterBase64(String posterBase64) { this.posterBase64 = posterBase64; }
+
+
     // Getters and setters for these (can stay empty if unused)
     public List<String> getWaitingList() { return waitingList; }
     public void setWaitingList(List<String> waitingList) { this.waitingList = waitingList; }

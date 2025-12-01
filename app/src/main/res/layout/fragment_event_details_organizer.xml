@@ -127,6 +127,13 @@
             android:text="Edit Event"
             android:layout_marginTop="12dp"/>
 
+        <Button
+            android:id="@+id/button_export_event"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Export Event"
+            android:layout_marginTop="12dp"/>
+
     </LinearLayout>
 </ScrollView>
 
