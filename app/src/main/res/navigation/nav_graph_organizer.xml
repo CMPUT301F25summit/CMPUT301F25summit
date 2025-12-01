@@ -49,6 +49,10 @@
             android:id="@+id/action_eventDetailsOrganizer_to_manageEvents"
             app:destination="@id/ManageEventsFragment"/>
 
+        <action
+            android:id="@+id/action_eventDetailsOrganizer_to_map"
+            app:destination="@id/mapFragment" />
+
     </fragment>
 
     <!-- Manage Entrants -->
@@ -99,6 +103,16 @@
     <action
         android:id="@+id/action_eventDetailsOrganizer_to_editEventFragment"
         app:destination="@+id/editEventFragment" />
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.summit.fragments.organizer.MapFragment"
+        tools:layout="@layout/fragment_map">
+
+        <argument
+            android:name="eventId"
+            app:argType="string" />
+    </fragment>
 
 
 

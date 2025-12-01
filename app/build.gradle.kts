@@ -52,6 +52,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("org.osmdroid:osmdroid-android:6.1.16")
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")

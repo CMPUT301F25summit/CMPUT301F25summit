@@ -99,6 +99,13 @@
             android:layout_marginBottom="24dp"/>
 
         <Button
+            android:id="@+id/button_view_map"
+            android:text="View Map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <Button
             android:id="@+id/button_view_qr"
             android:text="View QR Code"
             android:layout_width="match_parent"
