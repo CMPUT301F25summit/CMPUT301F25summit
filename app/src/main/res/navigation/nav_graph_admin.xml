@@ -27,12 +27,46 @@
         android:id="@+id/adminOrganizersFragment"
         android:name="com.example.summit.fragments.admin.AdminOrganizersFragment"
         android:label="Organizers"
-        tools:layout="@layout/fragment_admin_organizers"/>
+        tools:layout="@layout/fragment_admin_organizers">
+        <action
+            android:id="@+id/action_adminOrganizersFragment_to_organizerNotificationHubFragment"
+            app:destination="@id/organizerNotificationHubFragment" />
+        <action
+            android:id="@+id/action_adminOrganizersFragment_to_adminProfileViewFragment"
+            app:destination="@id/adminProfileViewFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/adminNotificationsFragment"
         android:name="com.example.summit.fragments.admin.AdminNotificationsFragment"
         android:label="Notifications"
         tools:layout="@layout/fragment_admin_notifications"/>
+
+    <fragment
+        android:id="@+id/organizerNotificationHubFragment"
+        android:name="com.example.summit.fragments.admin.OrganizerNotificationHubFragment"
+        android:label="Notification Log"
+        tools:layout="@layout/fragment_organizer_notification_hub">
+        <argument
+            android:name="organizer_id"
+            app:argType="string" />
+    </fragment>
+
+
+
+    <fragment
+        android:id="@+id/adminProfileViewFragment"
+        android:name="com.example.summit.fragments.admin.AdminProfileViewFragment"
+        android:label="User Profile"
+        tools:layout="@layout/fragment_admin_profile_view">
+        <argument
+            android:name="user_id"
+            app:argType="string" />
+        <argument
+            android:name="user_role"
+            app:argType="string" />
+    </fragment>
+
+
 
 </navigation>

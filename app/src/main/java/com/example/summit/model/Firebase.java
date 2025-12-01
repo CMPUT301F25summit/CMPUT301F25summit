@@ -4,10 +4,14 @@ import android.util.Log;
 import android.location.Location;
 
 import com.example.summit.interfaces.DeleteCallback;
+import com.example.summit.interfaces.EventIdsCallback;
 import com.example.summit.interfaces.EventLoadCallback;
 import com.example.summit.interfaces.EventPosterLoadCallback;
 import com.example.summit.interfaces.ImageDeleteCallback;
+import com.example.summit.interfaces.NotificationLogCallback;
+import com.example.summit.interfaces.OrganizerLoadCallback;
 import com.example.summit.interfaces.UserLoadCallback;
+import com.google.firebase.firestore.Query;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -503,6 +507,121 @@ public class Firebase {
                 Log.e("Firebase", "Error deleting poster: " + eventId, e);
                 callback.onImageDeleteFailure("Failed to delete: " + e.getMessage());
             });
+    }
+
+    /**
+     * Loads all organizers with real-time updates.
+     */
+    public static void loadAllOrganizersRealtime(OrganizerLoadCallback callback) {
+        db.collection("organizers").addSnapshotListener((value, error) -> {
+            if (error != null) {
+                callback.onLoadFailure(error.getMessage());
+                return;
+            }
+            List<Organizer> organizers = new ArrayList<>();
+            if (value != null) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Organizer org = doc.toObject(Organizer.class);
+                    if (org != null) organizers.add(org);
+                }
+            }
+            callback.onOrganizersLoaded(organizers);
+        });
+    }
+
+    /**
+     * Loads event IDs for a specific organizer.
+     */
+    public static void loadOrganizerEventIds(String organizerId, EventIdsCallback callback) {
+        db.collection("events")
+            .get()
+            .addOnSuccessListener(query -> {
+                List<String> eventIds = new ArrayList<>();
+                for (DocumentSnapshot doc : query.getDocuments()) {
+                    EventDescription desc = doc.toObject(EventDescription.class);
+                    if (desc != null && organizerId.equals(desc.getOrganizerId())) {
+                        eventIds.add(doc.getId());
+                    }
+                }
+                callback.onEventIdsLoaded(eventIds);
+            })
+            .addOnFailureListener(e -> callback.onLoadFailure(e.getMessage()));
+    }
+
+    /**
+     * Loads notifications for specific events with batching support.
+     */
+    public static void loadNotificationsForEvents(List<String> eventIds,
+                                                    NotificationLogCallback callback) {
+        if (eventIds.isEmpty()) {
+            callback.onNotificationsLoaded(new ArrayList<>());
+            return;
+        }
+
+        List<List<String>> batches = batchEventIds(eventIds, 10);
+        List<NotificationLogItem> allNotifications = new ArrayList<>();
+        AtomicInteger batchesCompleted = new AtomicInteger(0);
+
+        for (List<String> batch : batches) {
+            db.collection("notifications")
+                .whereIn("eventId", batch)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(query -> {
+                    synchronized (allNotifications) {
+                        for (DocumentSnapshot doc : query.getDocuments()) {
+                            NotificationLogItem item = new NotificationLogItem();
+                            item.setNotificationId(doc.getId());
+                            item.setRecipientId(doc.getString("entrantId"));
+                            item.setEventId(doc.getString("eventId"));
+                            item.setMessage(doc.getString("message"));
+                            Long timestamp = doc.getLong("timestamp");
+                            item.setTimestamp(timestamp != null ? timestamp : 0);
+                            item.setType(doc.getString("type"));
+                            item.setStatus(doc.getString("status"));
+                            allNotifications.add(item);
+                        }
+                        if (batchesCompleted.incrementAndGet() == batches.size()) {
+                            callback.onNotificationsLoaded(allNotifications);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> callback.onLoadFailure(e.getMessage()));
+        }
+    }
+
+    /**
+     * Helper to batch event IDs into groups.
+     */
+    private static List<List<String>> batchEventIds(List<String> ids, int batchSize) {
+        List<List<String>> batches = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i += batchSize) {
+            batches.add(ids.subList(i, Math.min(ids.size(), i + batchSize)));
+        }
+        return batches;
+    }
+
+    /**
+     * Deletes a notification from Firestore.
+     */
+    public static void deleteNotification(String notificationId, DeleteCallback callback) {
+        db.collection("notifications")
+            .document(notificationId)
+            .delete()
+            .addOnSuccessListener(v -> callback.onDeleteSuccess())
+            .addOnFailureListener(e -> callback.onDeleteFailure(e.getMessage()));
+    }
+
+    /**
+     * Updates a notification's message.
+     */
+    public static void updateNotificationMessage(String notificationId, String newMessage,
+                                                  DeleteCallback callback) {
+        db.collection("notifications")
+            .document(notificationId)
+            .update("message", newMessage)
+            .addOnSuccessListener(v -> callback.onDeleteSuccess())
+            .addOnFailureListener(e -> callback.onDeleteFailure(e.getMessage()));
     }
 
 }
