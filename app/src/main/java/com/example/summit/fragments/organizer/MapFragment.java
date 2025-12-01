@@ -27,6 +27,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A {@link Fragment} that displays a geographic map of entrants for a specific event.
+ * <p>
+ * This fragment uses the <b>OSMDroid</b> library to render OpenStreetMap tiles.
+ * It retrieves entrant data from Firestore based on the provided Event ID.
+ * <p>
+ * <b>Key Features:</b>
+ * <ul>
+ * <li>Fetches entrants from all event lists (Waiting, Accepted, Selected, Declined).</li>
+ * <li>Respects user privacy: Only plots entrants who have {@code locationShared = true}.</li>
+ * <li>Visualizes status: Markers display the entrant's name and their current status.</li>
+ * <li>Auto-Zoom: Automatically adjusts the map camera to fit all valid markers using a bounding box.</li>
+ * </ul>
+ *
+ * <b>Navigation Arguments:</b>
+ * <ul>
+ * <li>{@code EVENT_ID} (String): The unique ID of the event to visualize.</li>
+ * </ul>
+ */
+
 public class MapFragment extends Fragment {
 
     private MapView map;
@@ -35,7 +55,18 @@ public class MapFragment extends Fragment {
     private ImageButton backButton;
     private List<GeoPoint> activeMarkers = new ArrayList<>();
 
-
+    /**
+     * Inflates the layout, initializes the OSMDroid configuration, and sets up the map view.
+     * <p>
+     * <b>Important:</b> This method loads the OSMDroid configuration using the device's
+     * shared preferences. This is required to set a valid User-Agent, preventing the app
+     * from being blocked by OpenStreetMap servers.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
@@ -64,6 +95,18 @@ public class MapFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Orchestrates the loading of entrant data.
+     * <p>
+     * Steps:
+     * <ol>
+     * <li>Fetches the Event document.</li>
+     * <li>Aggregates user IDs from 'waitingList', 'acceptedList', 'selectedList', and 'declinedList'.</li>
+     * <li>Maps each User ID to their status (e.g., "ID_123" -> "Waiting").</li>
+     * <li>Iterates through the map and calls {@link #fetchAndPlotEntrant} for each user.</li>
+     * <li>Uses an {@link AtomicInteger} counter to detect when all asynchronous fetches are complete to trigger the zoom.</li>
+     * </ol>
+     */
     private void loadEntrants() {
         if (eventId == null) return;
 
@@ -98,6 +141,15 @@ public class MapFragment extends Fragment {
                     }
                 });
     }
+
+    /**
+     * Helper method to extract a list of IDs from a Firestore document and add them to the status map.
+     *
+     * @param map         The master map to populate.
+     * @param doc         The Event document snapshot.
+     * @param fieldName   The name of the array field in Firestore (e.g., "waitingList").
+     * @param statusLabel The human-readable status to assign (e.g., "Waiting").
+     */
     private void fillStatusMap(Map<String, String> map, com.google.firebase.firestore.DocumentSnapshot doc, String fieldName, String statusLabel) {
         List<String> list = (List<String>) doc.get(fieldName);
         if (list != null) {
@@ -107,7 +159,13 @@ public class MapFragment extends Fragment {
         }
     }
 
-
+    /**
+     * Fetches an individual Entrant's profile, verifies privacy settings, and adds a marker.
+     *
+     * @param entrantId  The document ID of the entrant.
+     * @param status     The status of the entrant in relation to the event.
+     * @param onComplete A Runnable callback that must be executed when the operation finishes (success or failure).
+     */
     private void fetchAndPlotEntrant(String entrantId, String status, Runnable onComplete) {
         db.collection("entrants").document(entrantId).get()
                 .addOnSuccessListener(entrantDoc -> {
@@ -129,6 +187,13 @@ public class MapFragment extends Fragment {
                 .addOnFailureListener(e -> onComplete.run());
     }
 
+    /**
+     * Adjusts the map view to fit all currently active markers.
+     * <p>
+     * If multiple markers exist, it calculates a {@link BoundingBox} containing all points
+     * and animates the camera to that box with padding.
+     * If only one marker exists, it centers the map on that point.
+     */
     private void zoomToMarkers() {
         if (activeMarkers.isEmpty()) return;
 
@@ -144,6 +209,13 @@ public class MapFragment extends Fragment {
         map.invalidate();
     }
 
+    /**
+     * Adds a graphical marker to the OSMDroid map overlay.
+     *
+     * @param point  The geographic coordinates for the marker.
+     * @param name   The name of the entrant (defaults to "Anonymous" if null).
+     * @param status The status of the entrant to be displayed in the snippet.
+     */
     private void addMarker(GeoPoint point, String title, String status) {
         Marker marker = new Marker(map);
         marker.setPosition(point);
@@ -156,12 +228,18 @@ public class MapFragment extends Fragment {
         map.invalidate();
     }
 
+    /**
+     * Resumes the map rendering engine. Required by OSMDroid.
+     */
     @Override
     public void onResume() {
         super.onResume();
         map.onResume();
     }
 
+    /**
+     * Pauses the map rendering engine to save resources. Required by OSMDroid.
+     */
     @Override
     public void onPause() {
         super.onPause();

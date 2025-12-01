@@ -146,6 +146,20 @@ public class EventDetailsOrganizerFragment extends Fragment {
                                 Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Fetches full {@link Entrant} objects from Firestore based on the IDs found in the event lists.
+     * <p>
+     * This method aggregates IDs from the {@code waitingList}, {@code acceptedList},
+     * {@code declinedList}, and {@code selectedList}.
+     * <p>
+     * <b>Implementation Note:</b>
+     * Firestore's {@code whereIn} query is limited to a maximum of 10 items per query.
+     * Therefore, this method splits the ID list into chunks of 10, creates a separate
+     * {@link Task} for each chunk, and executes them in parallel.
+     * The results are aggregated only after all tasks complete successfully.
+     *
+     * @param eventDoc The {@link DocumentSnapshot} of the current event containing the list arrays.
+     */
     private void loadEntrantsFromIds(DocumentSnapshot eventDoc) {
         List<String> ids = (List<String>) eventDoc.get("waitingList");
         ids.addAll((List<String>) eventDoc.get("acceptedList"));
@@ -296,6 +310,19 @@ public class EventDetailsOrganizerFragment extends Fragment {
 
     }
 
+    /**
+     * Generates a comma-separated value (CSV) string representing the provided list of entrants.
+     * <p>
+     * The CSV format is: <code>Name,Email,Status</code>.
+     * <p>
+     * The "Status" field is determined by checking which list (Waiting, Declined, Selected, or Accepted)
+     * the entrant's device ID currently resides in within the {@code eventDoc}.
+     *
+     * @param entrants  The list of {@link Entrant} objects to include in the report.
+     * @param eventDoc  The {@link DocumentSnapshot} of the event, used to determine the
+     * status (e.g., "Waiting", "Selected") of each entrant.
+     * @return A String containing the formatted CSV data, including a header row.
+     */
     private static String generateCSV(List<Entrant> entrants, DocumentSnapshot eventDoc) {
         StringBuilder csv = new StringBuilder();
         csv.append("Name,Email,Status\n");
@@ -325,6 +352,19 @@ public class EventDetailsOrganizerFragment extends Fragment {
         return csv.toString();
     }
 
+    /**
+     * Writes the provided string content to a file at the specified URI.
+     * <p>
+     * This method uses the system's {@link android.content.ContentResolver} to open an
+     * output stream to the target URI (typically returned by an
+     * {@link androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult} launcher).
+     * <p>
+     * If the write is successful, a success Toast is displayed. If an {@link IOException} occurs,
+     * an error Toast is displayed.
+     *
+     * @param uri        The target {@link Uri} where the file should be saved.
+     * @param csvContent The String content (e.g., generated CSV data) to write to the file.
+     */
     private void writeTextToUri(Uri uri, String csvContent) {
         try {
             OutputStream outputStream = requireContext().getContentResolver().openOutputStream(uri);
