@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -193,7 +194,16 @@ public class EventDetailsOrganizerFragment extends Fragment {
         String regStart = doc.getString("registrationStart");
         String regEnd = doc.getString("registrationEnd");
         Long capacity = doc.getLong("capacity");
-        String poster = doc.getString("posterUrl");
+        //String poster = doc.getString("posterUrl");
+        String posterBase64 = doc.getString("posterBase64");
+
+        if (posterBase64 != null && !posterBase64.isEmpty()) {
+            byte[] decoded = Base64.decode(posterBase64, Base64.DEFAULT);
+            Glide.with(this).asBitmap().load(decoded).into(posterImage);
+        } else {
+            posterImage.setImageResource(R.drawable.placeholder_event);
+        }
+
 
         titleText.setText(title);
         descText.setText(desc);
@@ -208,10 +218,10 @@ public class EventDetailsOrganizerFragment extends Fragment {
         invitedCountText.setText("Invited: " + invited);
         acceptedCountText.setText("Accepted: " + accepted);
 
-        Glide.with(this)
-                .load(poster)
-                .placeholder(R.drawable.placeholder_event)
-                .into(posterImage);
+//        Glide.with(this)
+//                .load(poster)
+//                .placeholder(R.drawable.placeholder_event)
+//                .into(posterImage);
     }
 
     /**
@@ -245,8 +255,8 @@ public class EventDetailsOrganizerFragment extends Fragment {
         editEventBtn.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putString("eventId", eventId);
-            Toast.makeText(getContext(), "TODO: Edit Event Screen Next",
-                    Toast.LENGTH_SHORT).show();
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_eventDetailsOrganizer_to_editEventFragment, args);
         });
 
         btnViewQr.setOnClickListener(v -> {
