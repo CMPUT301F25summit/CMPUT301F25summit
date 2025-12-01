@@ -256,7 +256,7 @@ public class CreateEventFragment extends Fragment {
         String location = locationInput.getText().toString().trim();
         String eventStart = eventStartInput.getText().toString().trim();
         String eventEnd = eventEndInput.getText().toString().trim();
-        Boolean selectedRequiredLocation = requireLocation.isSelected();
+        Boolean selectedRequiredLocation = requireLocation.isChecked();
 
         if (TextUtils.isEmpty(title) || TextUtils.isEmpty(desc) ||
                 TextUtils.isEmpty(cap) || TextUtils.isEmpty(regStart) || TextUtils.isEmpty(regEnd)) {
