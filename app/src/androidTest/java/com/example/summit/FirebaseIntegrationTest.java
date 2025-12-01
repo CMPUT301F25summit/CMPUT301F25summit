@@ -1,4 +1,4 @@
-package com.example.summit; // Or your app's package name
+package com.example.summit;
 
 import android.util.Log;
 
