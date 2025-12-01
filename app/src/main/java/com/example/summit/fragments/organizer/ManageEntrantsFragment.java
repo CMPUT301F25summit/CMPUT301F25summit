@@ -2,12 +2,14 @@ package com.example.summit.fragments.organizer;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +39,7 @@ public class ManageEntrantsFragment extends Fragment {
     private String eventId;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private EntrantAdapter adapter;
+    private ImageButton backButton;
 
     public ManageEntrantsFragment() {
         super(R.layout.fragment_manage_entrants);
@@ -56,6 +59,11 @@ public class ManageEntrantsFragment extends Fragment {
             Toast.makeText(getContext(), "Missing event ID", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        backButton = view.findViewById(R.id.btn_back);
+        backButton.setOnClickListener(v -> {
+            NavHostFragment.findNavController(this).popBackStack();
+        });
 
         RecyclerView rvEntrants = view.findViewById(R.id.rv_entrants);
         rvEntrants.setLayoutManager(new LinearLayoutManager(getContext()));

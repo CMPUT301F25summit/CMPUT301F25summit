@@ -69,7 +69,6 @@ public class ProfileOrganizerFragment extends Fragment {
         tvName = view.findViewById(R.id.tv_user_name);
         tvEmail = view.findViewById(R.id.tv_user_email);
         tvPhone = view.findViewById(R.id.tv_user_phone);
-        tvCity = view.findViewById(R.id.tv_user_city);
 
         OrganizerActivity parent = (OrganizerActivity) requireActivity();
         String deviceId = parent.getDeviceID();
@@ -83,7 +82,6 @@ public class ProfileOrganizerFragment extends Fragment {
                             tvName.setText(organizer.getName());
                             tvEmail.setText(organizer.getEmail());
                             tvPhone.setText(organizer.getPhone());
-                            tvCity.setText("City: Calary"); // need get city method
                         }
                     } else {
                         Toast.makeText(requireContext(), "No Organizer found.", Toast.LENGTH_SHORT).show();
@@ -109,12 +107,10 @@ public class ProfileOrganizerFragment extends Fragment {
         EditText eName = dialogView.findViewById(R.id.et_first_name);
         EditText ePhone = dialogView.findViewById(R.id.et_phone);
         EditText eEmail = dialogView.findViewById(R.id.et_email);
-        EditText eCity = dialogView.findViewById(R.id.et_city);
 
         eName.setText(organizer.getName());
         eEmail.setText(organizer.getEmail());
         ePhone.setText(organizer.getPhone());
-        eCity.setText("calgary"); // entrant.getCity
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
