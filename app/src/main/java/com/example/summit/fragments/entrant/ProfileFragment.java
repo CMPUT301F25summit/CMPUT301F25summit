@@ -115,12 +115,17 @@ public class ProfileFragment extends Fragment {
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     entrant.setName(eName.getText().toString().trim());
                     entrant.setEmail(eEmail.getText().toString().trim());
-                    // entrant.setphone
+                    entrant.setPhone(ePhone.getText().toString().trim());
                     entrant.setCity(eCity.getText().toString().trim());
 
                     Firebase.saveEntrant(entrant);
 
+                    tvName.setText(entrant.getName());
+                    tvEmail.setText(entrant.getEmail());
+                    tvPhone.setText(entrant.getPhone());
+                    tvCity.setText(entrant.getCity());
 
+                    Toast.makeText(requireContext(), "Profile updated", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create()

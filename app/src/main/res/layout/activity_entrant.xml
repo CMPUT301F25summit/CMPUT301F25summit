@@ -5,21 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- NavHostFragment that hosts entrant fragments -->
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_entrant"
     android:name="androidx.navigation.fragment.NavHostFragment"
     app:navGraph="@navigation/nav_graph_entrant"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:defaultNavHost="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 
-    <!-- Bottom navigation bar -->
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        app:layout_anchor="@id/nav_host_entrant"
+        app:layout_anchorGravity="bottom"
         app:menu="@menu/entrant_bottom_nav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

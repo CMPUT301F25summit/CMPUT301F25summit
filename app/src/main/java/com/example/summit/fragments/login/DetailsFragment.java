@@ -1,11 +1,15 @@
 package com.example.summit.fragments.login;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,8 +32,11 @@ import com.example.summit.model.User;
  */
 public class DetailsFragment extends Fragment {
     private EditText inputName, inputEmail, inputPhone;
+    private TextView nameRequired, emailRequired;
     private Button submitButton;
-    private boolean fields_filled;
+
+    private int defaultColour;
+    private int errorColour = Color.RED;
 
     /**
      * Inflates the fragment's view, initializes UI components, and sets up event listeners.
@@ -61,7 +68,14 @@ public class DetailsFragment extends Fragment {
         inputEmail = view.findViewById(R.id.input_email);
         inputPhone = view.findViewById(R.id.input_phone);
 
+        nameRequired = view.findViewById(R.id.name_required);
+        emailRequired = view.findViewById(R.id.email_required);
+
         submitButton = view.findViewById(R.id.button_submit);
+
+        //store default color
+        defaultColour = nameRequired.getCurrentTextColor();
+        addLiveValidationListeners();
 
         submitButton.setOnClickListener(v-> handleSubmit());
         return view;
@@ -78,20 +92,65 @@ public class DetailsFragment extends Fragment {
      * 5. Navigates to the {@code RoleSelectionFragment} (via action
      * {@code R.id.action_DetailsFragment_to_RoleSelectionFragment}), passing the bundle as arguments.
      */
+
+     private boolean validateName() {
+        String name = inputName.getText().toString().trim();
+        if(name.isEmpty()) {
+            nameRequired.setTextColor(errorColour);
+            return false;
+        } else {
+            nameRequired.setTextColor(defaultColour);
+            return true;
+        }
+     }
+
+     private boolean validateEmail() {
+        String email = inputEmail.getText().toString().trim();
+        boolean valid = email.contains("@") &&
+                        email.contains(".") &&
+                        email.indexOf('@') < email.lastIndexOf('.');
+        if(!valid) {
+            emailRequired.setTextColor(errorColour);
+            return false;
+        } else {
+            emailRequired.setTextColor(defaultColour);
+            return true;
+        }
+     }
+
+     private void addLiveValidationListeners() {
+
+        inputName.addTextChangedListener(new SimpleTextWatcher() {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validateName();
+            }
+        });
+
+        inputEmail.addTextChangedListener(new SimpleTextWatcher() {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validateEmail();
+            }
+        });
+     }
+
     private void handleSubmit() {
+
+        boolean nameOk = validateName();
+        boolean emailOk = validateEmail();
+
+        if(!nameOk || !emailOk) {
+            Toast.makeText(getContext(), "Please correct the required fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String name = inputName.getText().toString().trim();
         String email = inputEmail.getText().toString().trim();
         String phone = inputPhone.getText().toString().trim();
 
-        if(name.isEmpty() || email.isEmpty()) {
-            Toast.makeText(getContext(), "Please fill in all required fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         String deviceId = android.provider.Settings.Secure.getString(
                 requireContext().getContentResolver(),
-                Settings.Secure.ANDROID_ID
-        );
+                Settings.Secure.ANDROID_ID);
 
         Bundle args = new Bundle();
         args.putString("deviceId", deviceId);
@@ -103,4 +162,11 @@ public class DetailsFragment extends Fragment {
         NavHostFragment.findNavController(this)
                 .navigate(R.id.action_DetailsFragment_to_RoleSelectionFragment, args);
     }
+
+    private abstract class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void afterTextChanged(Editable s) {}
+    }
+
+
 }

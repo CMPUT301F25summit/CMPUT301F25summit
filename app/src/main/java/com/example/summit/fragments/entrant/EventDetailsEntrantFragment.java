@@ -1,8 +1,10 @@
 package com.example.summit.fragments.entrant;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,19 +12,26 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.summit.R;
+import com.example.summit.model.Event;
+import com.example.summit.model.EventDescription;
 import com.example.summit.session.Session;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EventDetailsEntrantFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String eventId;
+    private Button joinBtn;
+    private Event currentEvent;
 
     public EventDetailsEntrantFragment() {
         super(R.layout.fragment_event_details_entrant);
@@ -39,34 +48,139 @@ public class EventDetailsEntrantFragment extends Fragment {
         TextView capacity = view.findViewById(R.id.text_capacity);
         TextView dates = view.findViewById(R.id.text_reg_dates);
         ImageView poster = view.findViewById(R.id.image_event_poster);
-        Button joinBtn = view.findViewById(R.id.button_join_event);
+        joinBtn = view.findViewById(R.id.button_join_event);
+        ImageButton closeBtn = view.findViewById(R.id.button_close);
 
+        closeBtn.setOnClickListener(v -> {
+            NavHostFragment.findNavController(this).navigateUp();
+        });
+
+        loadEventDetails(title, desc, capacity, dates, poster);
+
+        joinBtn.setOnClickListener(v -> joinEvent());
+
+    }
+
+    private void loadEventDetails(TextView title, TextView desc, TextView capacity,
+                                  TextView dates, ImageView poster) {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        title.setText(doc.getString("title"));
-                        desc.setText(doc.getString("description"));
-                        capacity.setText("Capacity: " + doc.getLong("capacity"));
-                        String start = doc.getString("registrationStart");
-                        String end = doc.getString("registrationEnd");
-                        dates.setText("Registration: " + start + " - " + end);
+                    if (!doc.exists()) return;
 
-                        Glide.with(this)
-                                .load(doc.getString("posterUrl"))
-                                .placeholder(R.drawable.placeholder_event)
-                                .into(poster);
-                    }
-                });
+                    currentEvent = new Event();
+                    currentEvent.setId(doc.getId());
 
-        joinBtn.setOnClickListener(v -> {
-            String entrantId = Session.getEntrant().getDeviceId();
-            db.collection("events").document(eventId)
-                    .update("waitingList", FieldValue.arrayUnion(entrantId))
-                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(),
-                            "Joined event successfully!", Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(e -> Toast.makeText(getContext(),
-                            "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-        });
+                    // Build EventDescription manually
+                    EventDescription d = new EventDescription();
+                    d.setTitle("Event"); // no title field exists, so set default
+                    d.setDescription(doc.getString("description"));
+                    d.setLocation(doc.getString("location"));
+                    d.setCapacity(doc.getLong("capacity"));
+                    d.setEventStart(doc.getString("eventStart"));
+                    d.setEventEnd(doc.getString("eventEnd"));
+
+                    // posterBase64 is stored in Firestore → we treat it as the posterUrl
+                    d.setPosterUrl(doc.getString("posterBase64"));
+
+                    currentEvent.setDescription(d);
+
+                    // Load list fields
+                    List<String> registered = (List<String>) doc.get("acceptedList");
+                    List<String> declined = (List<String>) doc.get("declinedList");
+
+                    if (registered == null) registered = new ArrayList<>();
+                    if (declined == null) declined = new ArrayList<>();
+
+                    currentEvent.setRegisteredEntrants(registered);
+                    currentEvent.setDeclinedEntrants(declined);
+
+                    // Firestore may not have waitingList at all
+                    List<String> waitlist = (List<String>) doc.get("waitingList");
+                    if (waitlist == null) waitlist = new ArrayList<>();
+                    currentEvent.setWaitingList(waitlist);
+
+                    // Update UI
+                    renderUI(title, desc, capacity, dates, poster);
+                    updateButtonState();
+
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(),
+                            "Failed to load event: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                    });
+    }
+
+    private void renderUI(TextView title, TextView desc, TextView capacity,
+                          TextView dates, ImageView poster) {
+        EventDescription ed = currentEvent.getDescription();
+
+        title.setText(ed.getTitle());
+        desc.setText(ed.getDescription());
+        capacity.setText("Capacity: " + ed.getCapacity());
+
+        dates.setText("Event: " + ed.getEventStart() + " - " + ed.getEventEnd());
+
+        Glide.with(this)
+                .load(ed.getPosterUrl())
+                .placeholder(R.drawable.placeholder_event)
+                .into(poster);
+
+
+    }
+
+    private void updateButtonState() {
+        if(currentEvent == null) return;
+
+        String entrantId = Session.getEntrant().getDeviceId();
+
+        List<String> waitingList = currentEvent.getWaitingList();
+        List<String> registeredList = currentEvent.getRegisteredEntrants();
+
+        if (waitingList == null) waitingList = new ArrayList<>();
+        if (registeredList == null) registeredList = new ArrayList<>();
+
+        if(registeredList.contains(entrantId)) {
+            joinBtn.setText("You've Been Selected!");
+            joinBtn.setEnabled(false);
+            joinBtn.setBackgroundResource(R.drawable.join_event_button_grn);
+            joinBtn.setTextColor(Color.WHITE);
+        }
+        else if (waitingList.contains(entrantId)) {
+            joinBtn.setText("Already on Waitlist");
+            joinBtn.setEnabled(false);
+            joinBtn.setBackgroundResource(R.drawable.join_event_button_gray);
+            joinBtn.setTextColor(Color.WHITE);
+        }
+        else {
+            joinBtn.setText("Join Event");
+            joinBtn.setEnabled(true);
+            joinBtn.setBackgroundResource(R.drawable.join_event_button_blk);
+            joinBtn.setTextColor(Color.WHITE);
+
+        }
+    }
+
+    private void joinEvent() {
+        String entrantId = Session.getEntrant().getDeviceId();
+
+        db.collection("events").document(eventId)
+                .update("waitingList", FieldValue.arrayUnion(entrantId))
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(),
+                                "Joined waitlist successfully!", Toast.LENGTH_SHORT).show();
+
+                    if (currentEvent.getWaitingList() == null)
+                        currentEvent.setWaitingList(new ArrayList<>());
+
+                    currentEvent.getWaitingList().add(entrantId);
+
+                    updateButtonState();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(),
+                                "Failed: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show());
     }
 }
 
