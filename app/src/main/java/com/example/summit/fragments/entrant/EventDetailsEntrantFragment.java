@@ -85,7 +85,7 @@ public class EventDetailsEntrantFragment extends Fragment {
                     d.setEventEnd(doc.getString("eventEnd"));
 
                     // posterBase64 is stored in Firestore → we treat it as the posterUrl
-                    d.setPosterUrl(doc.getString("posterBase64"));
+                    d.setPosterBase64(doc.getString("posterBase64"));
 
                     currentEvent.setDescription(d);
 
@@ -125,7 +125,7 @@ public class EventDetailsEntrantFragment extends Fragment {
         capacity.setText("Capacity: " + ed.getCapacity());
         dates.setText("Event: " + ed.getEventStart() + " - " + ed.getEventEnd());
 
-        String posterBase64 = ed.getPosterUrl();
+        String posterBase64 = ed.getPosterBase64();
         if (posterBase64 != null && !posterBase64.isEmpty()) {
             try {
                 byte[] decodedBytes = Base64.decode(posterBase64, Base64.DEFAULT);
