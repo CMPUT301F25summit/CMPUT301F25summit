@@ -30,6 +30,7 @@ public class Event {
     public void setId(String id) { this.id = id; }
 
     public EventDescription getDescription() { return description; }
+    public EventDescription getEventDescription() { return description; }
     public void setDescription(EventDescription description) { this.description = description; }
 
     public List<String> getRegisteredEntrants() { return registeredEntrants; }

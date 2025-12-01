@@ -5,6 +5,8 @@ import android.location.Location;
 
 import com.example.summit.interfaces.DeleteCallback;
 import com.example.summit.interfaces.EventLoadCallback;
+import com.example.summit.interfaces.EventPosterLoadCallback;
+import com.example.summit.interfaces.ImageDeleteCallback;
 import com.example.summit.interfaces.UserLoadCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -12,7 +14,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -394,6 +398,111 @@ public class Firebase {
             default:
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
+    }
+
+    /**
+     * Loads all event posters with associated organizer names from Firestore.
+     * Only includes events that have posterBase64 data.
+     * <p>
+     * This method fetches events from the 'events' collection and joins them with
+     * organizer data from the 'organizers' collection to create EventPoster objects.
+     *
+     * @param callback Callback invoked with list of EventPoster objects or error
+     */
+    public static void loadAllEventPosters(EventPosterLoadCallback callback) {
+        db.collection("events")
+            .get()
+            .addOnSuccessListener(eventQuery -> {
+                List<EventPoster> posters = new ArrayList<>();
+                AtomicInteger pendingOrganizers = new AtomicInteger(0);
+
+                // Filter events that have posters
+                List<DocumentSnapshot> eventsWithPosters = new ArrayList<>();
+                for (DocumentSnapshot eventDoc : eventQuery.getDocuments()) {
+                    EventDescription desc = eventDoc.toObject(EventDescription.class);
+                    if (desc != null && desc.getPosterBase64() != null
+                        && !desc.getPosterBase64().isEmpty()) {
+                        eventsWithPosters.add(eventDoc);
+                    }
+                }
+
+                if (eventsWithPosters.isEmpty()) {
+                    callback.onPostersLoaded(new ArrayList<>());
+                    return;
+                }
+
+                pendingOrganizers.set(eventsWithPosters.size());
+
+                // For each event, fetch organizer name and create EventPoster
+                for (DocumentSnapshot eventDoc : eventsWithPosters) {
+                    EventDescription desc = eventDoc.toObject(EventDescription.class);
+                    Event event = new Event(desc);
+                    event.setId(eventDoc.getId());
+
+                    String organizerId = desc.getOrganizerId();
+
+                    // Fetch organizer name
+                    db.collection("organizers")
+                        .document(organizerId)
+                        .get()
+                        .addOnSuccessListener(orgDoc -> {
+                            String organizerName = "Unknown Organizer";
+                            if (orgDoc.exists()) {
+                                Organizer org = orgDoc.toObject(Organizer.class);
+                                if (org != null) {
+                                    organizerName = org.getName();
+                                }
+                            }
+
+                            EventPoster poster = new EventPoster(event, organizerName);
+                            poster.setPosterUrl(desc.getPosterBase64());
+                            posters.add(poster);
+
+                            // Check if all organizers loaded
+                            if (pendingOrganizers.decrementAndGet() == 0) {
+                                callback.onPostersLoaded(posters);
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            // Add with default organizer name on failure
+                            EventPoster poster = new EventPoster(event, "Unknown Organizer");
+                            poster.setPosterUrl(desc.getPosterBase64());
+                            posters.add(poster);
+
+                            if (pendingOrganizers.decrementAndGet() == 0) {
+                                callback.onPostersLoaded(posters);
+                            }
+                        });
+                }
+            })
+            .addOnFailureListener(e ->
+                callback.onLoadFailure("Failed to load events: " + e.getMessage())
+            );
+    }
+
+    /**
+     * Deletes an event's poster by removing the posterBase64 field from Firestore.
+     * Does not delete the entire event, only the image data.
+     *
+     * @param eventId The ID of the event whose poster should be deleted
+     * @param callback Callback invoked on success or failure
+     */
+    public static void deleteEventPoster(String eventId, ImageDeleteCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("posterBase64", null);
+        updates.put("posterUrl", null);
+
+        db.collection("events")
+            .document(eventId)
+            .update(updates)
+            .addOnSuccessListener(aVoid -> {
+                Log.d("Firebase", "Poster deleted for event: " + eventId);
+                callback.onImageDeleteSuccess();
+            })
+            .addOnFailureListener(e -> {
+                Log.e("Firebase", "Error deleting poster: " + eventId, e);
+                callback.onImageDeleteFailure("Failed to delete: " + e.getMessage());
+            });
     }
 
 }
