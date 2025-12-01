@@ -31,9 +31,13 @@ public class EntrantActivity extends AppCompatActivity {
 
         deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
+
         if(name != null && !name.isEmpty()) {
             Toast.makeText(this, "Welcome, " + name + "!", Toast.LENGTH_SHORT).show();
         }
+
+
+
 
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_entrant);

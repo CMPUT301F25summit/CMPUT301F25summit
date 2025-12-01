@@ -47,6 +47,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
      * The list of events this adapter displays.
      */
     private List<Event> events = new ArrayList<>();
+    private List<Event> fullList = new ArrayList<>();
     /**
      * The application context, used for inflating layouts and Glide.
      */
@@ -75,6 +76,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
      */
     public void updateEvents(List<Event> newEvents) {
         this.events = newEvents;
+        this.fullList = new ArrayList<>(newEvents);
         notifyDataSetChanged();
     }
 
@@ -159,6 +161,29 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return events.size();
+    }
+
+    public void filterByKeyword(String keyword) {
+        keyword = keyword.toLowerCase().trim();
+        List<Event> filtered = new ArrayList<>();
+
+        for(Event e : fullList) {
+            EventDescription ed = e.getDescription();
+
+            if(ed == null) continue;
+
+            if((ed.getTitle() != null && ed.getTitle().toLowerCase().contains(keyword)) ||
+            (ed.getDescription() != null && ed.getDescription().toLowerCase().contains(keyword))) {
+                filtered.add(e);
+            }
+        }
+        this.events = filtered;
+        notifyDataSetChanged();
+    }
+
+    public void resetFilters() {
+        this.events = new ArrayList<>(fullList);
+        notifyDataSetChanged();
     }
 }
 

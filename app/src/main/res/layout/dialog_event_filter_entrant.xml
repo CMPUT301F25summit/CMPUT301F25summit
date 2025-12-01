@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/input_keyword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Keyword (title/description)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/input_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Start date (YYYY-MM-DD)"
+            android:layout_marginTop="16dp"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/input_end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="End date (YYYY-MM-DD)"
+            android:layout_marginTop="12dp"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/input_capacity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Maximum capacity (1 - 10000)"
+            android:layout_marginTop="16dp"
+            android:inputType="number" />
+
+
+        <AutoCompleteTextView
+            android:id="@+id/input_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Location (optional)"
+            android:inputType="text"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</ScrollView>
