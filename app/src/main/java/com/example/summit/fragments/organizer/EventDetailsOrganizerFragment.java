@@ -161,17 +161,24 @@ public class EventDetailsOrganizerFragment extends Fragment {
      * @param eventDoc The {@link DocumentSnapshot} of the current event containing the list arrays.
      */
     private void loadEntrantsFromIds(DocumentSnapshot eventDoc) {
-        List<String> ids = (List<String>) eventDoc.get("waitingList");
-        ids.addAll((List<String>) eventDoc.get("acceptedList"));
-        ids.addAll((List<String>) eventDoc.get("declinedList"));
-        ids.addAll((List<String>) eventDoc.get("selectedList"));
+        List<String> ids = new ArrayList<>();
 
-        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+        List<String> waiting  = (List<String>) eventDoc.get("waitingList");
+        List<String> accepted = (List<String>) eventDoc.get("acceptedList");
+        List<String> declined = (List<String>) eventDoc.get("declinedList");
+        List<String> selected = (List<String>) eventDoc.get("selectedList");
 
-        if (ids == null || ids.isEmpty()) {
+        if (waiting  != null) ids.addAll(waiting);
+        if (accepted != null) ids.addAll(accepted);
+        if (declined != null) ids.addAll(declined);
+        if (selected != null) ids.addAll(selected);
+
+        if (ids.isEmpty()) {
             entrants = new ArrayList<>();
             return;
         }
+
+        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
 
         int chunkSize = 10;
         for (int i = 0; i < ids.size(); i += chunkSize) {
@@ -185,13 +192,13 @@ public class EventDetailsOrganizerFragment extends Fragment {
 
         Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
             entrants = new ArrayList<>();
-
             for (Object obj : results) {
                 QuerySnapshot snapshot = (QuerySnapshot) obj;
                 entrants.addAll(snapshot.toObjects(Entrant.class));
             }
         });
     }
+
 
 
 

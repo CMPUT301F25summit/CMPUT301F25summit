@@ -82,6 +82,7 @@ public class ProfileOrganizerFragment extends Fragment {
                             tvName.setText(organizer.getName());
                             tvEmail.setText(organizer.getEmail());
                             tvPhone.setText(organizer.getPhone());
+                            tvCity.setText("Calgary"); // need get city method
                         }
                     } else {
                         Toast.makeText(requireContext(), "No Organizer found.", Toast.LENGTH_SHORT).show();
@@ -111,6 +112,7 @@ public class ProfileOrganizerFragment extends Fragment {
         eName.setText(organizer.getName());
         eEmail.setText(organizer.getEmail());
         ePhone.setText(organizer.getPhone());
+        eCity.setText("Calgary"); // entrant.getCity
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
