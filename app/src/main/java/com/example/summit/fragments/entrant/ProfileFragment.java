@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,17 +19,26 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.summit.EntrantActivity;
 import com.example.summit.MainActivity;
 import com.example.summit.R;
+import com.example.summit.adapters.EntrantEventAdapter;
 import com.example.summit.model.Entrant;
+import com.example.summit.model.Event;
+import com.example.summit.model.EventDescription;
 import com.example.summit.model.Firebase;
+import com.example.summit.utils.ProfileEventFilterUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,11 +71,20 @@ import java.util.Locale;
 public class ProfileFragment extends Fragment {
 
     private Button editBtn, deleteBtn;
+    private ImageButton searchBtn;
     private Switch locationToggle;
     private FusedLocationProviderClient fusedLocationClient;
     private Entrant entrant;
     private FirebaseFirestore db;
     private TextView tvName, tvEmail, tvPhone, tvCity;
+
+    private RecyclerView recyclerEventHistory;
+    private EntrantEventAdapter eventAdapter;
+    private EditText searchInput;
+    private Button filterBtn;
+
+    private List<Event> allUserEvents = new ArrayList<>();
+    private List<String> allUserStatuses = new ArrayList<>();
 
     @Nullable
     @Override
@@ -74,63 +93,173 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         db = FirebaseFirestore.getInstance();
 
+        initializeViews(view);
+        setupRecyclerView();
+        loadEntrantData();
+        setupClickListeners();
+        return view;
+    }
+
+    private void initializeViews(View view) {
         locationToggle = view.findViewById(R.id.location_toggle);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
         editBtn = view.findViewById(R.id.btn_edit);
         deleteBtn = view.findViewById(R.id.btn_delete_account);
         tvName = view.findViewById(R.id.tv_user_name);
         tvEmail = view.findViewById(R.id.tv_user_email);
         tvPhone = view.findViewById(R.id.tv_user_phone);
         tvCity = view.findViewById(R.id.tv_user_city);
+        recyclerEventHistory = view.findViewById(R.id.recycler_event_history);
+        searchInput = view.findViewById(R.id.et_search_events);
+        searchBtn = view.findViewById(R.id.profile_btn_search);
+        filterBtn = view.findViewById(R.id.btn_profile_filter);
 
+        locationToggle.setEnabled(false);
+    }
+
+    private void setupRecyclerView() {
+        recyclerEventHistory.setLayoutManager(new LinearLayoutManager(requireContext()));
+        eventAdapter = new EntrantEventAdapter(requireContext(), event -> {
+            Bundle args = new Bundle();
+            args.putString("eventId", event.getId());
+            NavHostFragment.findNavController(ProfileFragment.this)
+                    .navigate(R.id.EventDetailsEntrantFragment, args);
+        });
+        recyclerEventHistory.setAdapter(eventAdapter);
+    }
+
+    private void loadEntrantData() {
         EntrantActivity parent = (EntrantActivity) requireActivity();
         String deviceId = parent.getDeviceID();
 
-        locationToggle.setEnabled(false);
+        db.collection("entrants").document(deviceId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        entrant = document.toObject(Entrant.class);
+                        if (entrant != null) {
+                            updateUI();
+                            setupLocationToggle();
+                            loadUserEvents(deviceId);
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), "No Entrant found.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(requireContext(), "Failed to load entrant.", Toast.LENGTH_SHORT).show());
+    }
 
-       db.collection("entrants").document(deviceId)
-                       .get()
-                       .addOnSuccessListener(document -> {
-                                if(document.exists()) {
-                                    entrant = document.toObject(Entrant.class);
-                                    if(entrant != null) {
-                                        tvName.setText(entrant.getName());
-                                        tvEmail.setText(entrant.getEmail());
-                                        tvPhone.setText(entrant.getPhone());
-                                        tvCity.setText(entrant.getCity() != null ? entrant.getCity() : "Location not shared");
+    private void updateUI() {
+        tvName.setText(entrant.getName());
+        tvEmail.setText(entrant.getEmail());
+        tvPhone.setText(entrant.getPhone());
+        tvCity.setText(entrant.getCity() != null ? entrant.getCity() : "Location not shared");
+    }
 
-                                        locationToggle.setEnabled(true);
-                                        locationToggle.setChecked(entrant.getLocationShared());
+    private void setupLocationToggle() {
+        locationToggle.setEnabled(true);
+        locationToggle.setChecked(entrant.getLocationShared());
 
-                                        locationToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                                            if (isChecked) {
-                                                if (hasLocationPermission()) {
-                                                    enableLocationSharing();
-                                                } else {
-                                                    requestLocationPermission();
-                                                    locationToggle.setChecked(false);
-                                                }
-                                            } else {
-                                                disableLocationSharing();
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    Toast.makeText(requireContext(), "No Entrant found.", Toast.LENGTH_SHORT).show();
-                                }
-                               })
-                                .addOnFailureListener(e ->
-                                               Toast.makeText(requireContext(), "Failed to load entrant.", Toast.LENGTH_SHORT).show());
+        locationToggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (hasLocationPermission()) {
+                    enableLocationSharing();
+                } else {
+                    requestLocationPermission();
+                    locationToggle.setChecked(false);
+                }
+            } else {
+                disableLocationSharing();
+            }
+        });
+    }
 
+    private void setupClickListeners() {
         editBtn.setOnClickListener(v -> showEditProfileDialog());
         deleteBtn.setOnClickListener(v -> confirmDeleteAccount());
 
-        return view;
+        // Search button - use utility
+        searchBtn.setOnClickListener(v -> {
+            String keyword = searchInput.getText().toString().trim();
+            ProfileEventFilterUtil.FilterResult result =
+                    ProfileEventFilterUtil.searchByKeyword(allUserEvents, allUserStatuses, keyword);
+            eventAdapter.updateEvents(result.events, result.statuses);
+        });
+
+        // Filter button - use utility
+        filterBtn.setOnClickListener(v -> {
+            ProfileEventFilterUtil.showFilterDialog(
+                    requireContext(),
+                    allUserEvents,
+                    allUserStatuses,
+                    new ProfileEventFilterUtil.ProfileFilterCallback() {
+                        @Override
+                        public void onFilterApplied(List<Event> filteredEvents, List<String> filteredStatuses) {
+                            eventAdapter.updateEvents(filteredEvents, filteredStatuses);
+                        }
+
+                        @Override
+                        public void onFilterReset(List<Event> allEvents, List<String> allStatuses) {
+                            eventAdapter.updateEvents(allEvents, allStatuses);
+                        }
+                    }
+            );
+        });
     }
 
+    private void loadUserEvents(String deviceId) {
+        db.collection("events").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    allUserEvents.clear();
+                    allUserStatuses.clear();
+
+                    querySnapshot.forEach(doc -> {
+                        Event event = new Event();
+                        event.setId(doc.getId());
+
+                        EventDescription d = new EventDescription();
+                        d.setTitle(doc.getString("title"));
+                        d.setDescription(doc.getString("description"));
+                        d.setLocation(doc.getString("location"));
+                        d.setCapacity(doc.getLong("capacity"));
+                        d.setEventStart(doc.getString("eventStart"));
+                        d.setEventEnd(doc.getString("eventEnd"));
+                        d.setPosterUrl(doc.getString("posterBase64"));
+                        event.setDescription(d);
+
+                        List<String> acceptedList = (List<String>) doc.get("acceptedList");
+                        List<String> waitingList = (List<String>) doc.get("waitingList");
+                        List<String> declinedList = (List<String>) doc.get("declinedList");
+
+                        if (acceptedList != null && acceptedList.contains(deviceId)) {
+                            allUserEvents.add(event);
+                            allUserStatuses.add("Selected");
+                        } else if (waitingList != null && waitingList.contains(deviceId)) {
+                            allUserEvents.add(event);
+                            allUserStatuses.add("Waitlist");
+                        } else if (declinedList != null && declinedList.contains(deviceId)) {
+                            allUserEvents.add(event);
+                            allUserStatuses.add("Declined");
+                        }
+                    });
+
+                    eventAdapter.updateEvents(allUserEvents, allUserStatuses);
+
+                    if (allUserEvents.isEmpty()) {
+                        Toast.makeText(requireContext(), "No events found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(), "Failed to load events: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // Location methods remain the same
     private void enableLocationSharing() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(location -> {
                         if (location != null) {
@@ -140,7 +269,6 @@ public class ProfileFragment extends Fragment {
                             entrant.setCity(city);
                             entrant.setLocationShared(true);
                             Firebase.saveEntrant(entrant);
-
                             tvCity.setText(city);
                         } else {
                             Toast.makeText(requireContext(), "Turn on GPS device settings", Toast.LENGTH_SHORT).show();
@@ -158,13 +286,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private boolean hasLocationPermission() {
-        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        ActivityCompat.requestPermissions(requireActivity(),
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
     }
-
 
     private void showEditProfileDialog() {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -178,7 +307,7 @@ public class ProfileFragment extends Fragment {
         eName.setText(entrant.getName());
         eEmail.setText(entrant.getEmail());
         ePhone.setText(entrant.getPhone());
-        eCity.setText(entrant.getCity());// entrant.getCity
+        eCity.setText(entrant.getCity());
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
@@ -190,11 +319,7 @@ public class ProfileFragment extends Fragment {
                     entrant.setCity(eCity.getText().toString().trim());
 
                     Firebase.saveEntrant(entrant);
-
-                    tvName.setText(entrant.getName());
-                    tvEmail.setText(entrant.getEmail());
-                    tvPhone.setText(entrant.getPhone());
-                    tvCity.setText(entrant.getCity());
+                    updateUI();
 
                     Toast.makeText(requireContext(), "Profile updated", Toast.LENGTH_SHORT).show();
                 })
@@ -216,7 +341,6 @@ public class ProfileFragment extends Fragment {
 
             if (addresses != null && !addresses.isEmpty()) {
                 String city = addresses.get(0).getLocality();
-
                 if (city == null) {
                     city = addresses.get(0).getSubAdminArea();
                 }
@@ -228,21 +352,28 @@ public class ProfileFragment extends Fragment {
         return "Unknown City";
     }
 
-
     private void confirmDeleteAccount() {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete Account")
                 .setMessage("Are you sure you want to delete your account?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-            Firebase.deleteEntrant(entrant);
-            Intent intent = new Intent(requireContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            requireActivity().finish();
+                    Firebase.deleteEntrant(entrant);
+                    Intent intent = new Intent(requireContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    requireActivity().finish();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (entrant != null) {
+            loadUserEvents(entrant.getDeviceId());
+        }
+    }
 }
+

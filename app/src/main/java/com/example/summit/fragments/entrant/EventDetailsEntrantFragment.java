@@ -123,14 +123,24 @@ public class EventDetailsEntrantFragment extends Fragment {
         title.setText(ed.getTitle());
         desc.setText(ed.getDescription());
         capacity.setText("Capacity: " + ed.getCapacity());
-
         dates.setText("Event: " + ed.getEventStart() + " - " + ed.getEventEnd());
 
+        String posterBase64 = ed.getPosterUrl();
+        if (posterBase64 != null && !posterBase64.isEmpty()) {
+            try {
+                byte[] decodedBytes = Base64.decode(posterBase64, Base64.DEFAULT);
         Glide.with(this)
-                .load(ed.getPosterUrl())
+                .load(decodedBytes)
                 .placeholder(R.drawable.placeholder_event)
+                .error(R.drawable.placeholder_event)
                 .into(poster);
-
+            } catch (IllegalArgumentException e) {
+                // If Base64 decoding fails, show placeholder
+                poster.setImageResource(R.drawable.placeholder_event);
+            }
+        } else {
+            poster.setImageResource(R.drawable.placeholder_event);
+        }
 
     }
 
