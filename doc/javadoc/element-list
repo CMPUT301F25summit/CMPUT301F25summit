@@ -1,0 +1,10 @@
+com.example.summit
+com.example.summit.adapters
+com.example.summit.fragments.admin
+com.example.summit.fragments.entrant
+com.example.summit.fragments.login
+com.example.summit.fragments.organizer
+com.example.summit.interfaces
+com.example.summit.model
+com.example.summit.session
+com.example.summit.utils
