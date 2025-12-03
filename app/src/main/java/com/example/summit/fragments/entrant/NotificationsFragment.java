@@ -73,6 +73,7 @@ public class NotificationsFragment extends Fragment {
                         if ("admin".equals(senderType) && !allowAdmin) continue;
                         if ("organizer".equals(senderType) && !allowOrganizer) continue;
 
+
                         View notifView = LayoutInflater.from(getContext())
                                 .inflate(R.layout.item_notification, container, false);
 
