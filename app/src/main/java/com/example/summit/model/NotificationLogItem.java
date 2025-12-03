@@ -15,6 +15,8 @@ public class NotificationLogItem {
     private String type;                // "custom" or "invitation"
     private String status;              // "pending", "accepted", "declined", "info"
     private boolean isExpanded;         // UI state for message expansion
+    private String organizerId;         // Device ID of organizer who sent notification
+    private String organizerName;       // Name of the organizer (fetched from organizers collection)
 
     /**
      * Default constructor for Firestore.
@@ -25,10 +27,13 @@ public class NotificationLogItem {
     /**
      * Full constructor.
      */
-    public NotificationLogItem(String notificationId, String recipientId, String recipientName,
+    public NotificationLogItem(String notificationId, String organizerId, String organizerName,
+                                String recipientId, String recipientName,
                                 String eventId, String eventTitle, String message,
                                 long timestamp, String type, String status) {
         this.notificationId = notificationId;
+        this.organizerId = organizerId;
+        this.organizerName = organizerName;
         this.recipientId = recipientId;
         this.recipientName = recipientName;
         this.eventId = eventId;
@@ -81,6 +86,14 @@ public class NotificationLogItem {
         return isExpanded;
     }
 
+    public String getOrganizerId() {
+        return organizerId;
+    }
+
+    public String getOrganizerName() {
+        return organizerName;
+    }
+
     // Setters
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
@@ -120,5 +133,13 @@ public class NotificationLogItem {
 
     public void setExpanded(boolean expanded) {
         isExpanded = expanded;
+    }
+
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
+    }
+
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
     }
 }

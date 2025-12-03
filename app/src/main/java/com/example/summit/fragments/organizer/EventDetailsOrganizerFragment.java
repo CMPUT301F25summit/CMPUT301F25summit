@@ -25,8 +25,10 @@ import com.example.summit.R;
 import com.example.summit.model.Entrant;
 import com.example.summit.model.Event;
 import com.example.summit.model.EventDescription;
+import com.example.summit.model.Firebase;
 import com.example.summit.model.LotterySystem;
 import com.example.summit.model.WaitingList;
+import com.example.summit.session.Session;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -450,7 +452,7 @@ public class EventDetailsOrganizerFragment extends Fragment {
 
     /**
      * Creates and saves a new notification document in the "notifications"
-     * collection for each newly invited entrant.
+     * collection for each newly invited entrant, and logs it to "notification_logs".
      *
      * @param invitedIds List of entrant IDs who were selected.
      * @param eventTitle The title of the event, for the notification message.
@@ -458,6 +460,9 @@ public class EventDetailsOrganizerFragment extends Fragment {
     private void sendSelectionNotifications(List<String> invitedIds, String eventTitle) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         long timestamp = System.currentTimeMillis();
+
+        // Get organizerId from Session
+        String organizerId = Session.getOrganizer().getDeviceId();
 
         for (String entrantId : invitedIds) {
             Map<String, Object> notif = new HashMap<>();
@@ -469,6 +474,18 @@ public class EventDetailsOrganizerFragment extends Fragment {
             notif.put("status", "pending");
 
             db.collection("notifications").add(notif);
+
+            // Log notification for admin tracking
+            Firebase.logNotification(
+                organizerId,
+                entrantId,
+                eventId,
+                "You have been selected for \"" + eventTitle + "\"! Please accept or decline.",
+                timestamp,
+                "invitation",
+                "pending",
+                getContext()
+            );
         }
     }
 

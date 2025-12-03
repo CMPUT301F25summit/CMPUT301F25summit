@@ -1,13 +1,16 @@
 package com.example.summit.model;
 
+import android.content.Context;
 import android.util.Log;
 import android.location.Location;
+import android.widget.Toast;
 
 import com.example.summit.interfaces.DeleteCallback;
 import com.example.summit.interfaces.EventIdsCallback;
 import com.example.summit.interfaces.EventLoadCallback;
 import com.example.summit.interfaces.EventPosterLoadCallback;
 import com.example.summit.interfaces.ImageDeleteCallback;
+import com.example.summit.interfaces.MigrationCallback;
 import com.example.summit.interfaces.NotificationLogCallback;
 import com.example.summit.interfaces.OrganizerLoadCallback;
 import com.example.summit.interfaces.UserLoadCallback;
@@ -622,6 +625,283 @@ public class Firebase {
             .update("message", newMessage)
             .addOnSuccessListener(v -> callback.onDeleteSuccess())
             .addOnFailureListener(e -> callback.onDeleteFailure(e.getMessage()));
+    }
+
+    /**
+     * Logs a notification to the notification_logs collection with enriched data.
+     * <p>
+     * This method fetches organizer name, event title, and recipient name from Firestore
+     * to create a complete log entry. It runs asynchronously and does not block the
+     * notification sending process. If logging fails, a Toast error is shown to the organizer.
+     *
+     * @param organizerId The device ID of the organizer sending the notification
+     * @param recipientId The device ID of the recipient (entrant)
+     * @param eventId The ID of the event related to this notification
+     * @param message The notification message text
+     * @param timestamp The timestamp when the notification was sent
+     * @param type The type of notification ("custom" or "invitation")
+     * @param status The status of the notification ("info", "pending", etc.)
+     * @param context The context for displaying Toast messages
+     */
+    public static void logNotification(String organizerId, String recipientId,
+                                       String eventId, String message,
+                                       long timestamp, String type, String status,
+                                       Context context) {
+        // Fetch organizer name
+        db.collection("organizers").document(organizerId).get()
+            .addOnSuccessListener(organizerDoc -> {
+                String organizerName = "Unknown Organizer";
+                if (organizerDoc.exists() && organizerDoc.getString("name") != null) {
+                    organizerName = organizerDoc.getString("name");
+                }
+                final String finalOrganizerName = organizerName;
+
+                // Fetch event title
+                db.collection("events").document(eventId).get()
+                    .addOnSuccessListener(eventDoc -> {
+                        String eventTitle = "Unknown Event";
+                        if (eventDoc.exists() && eventDoc.getString("title") != null) {
+                            eventTitle = eventDoc.getString("title");
+                        }
+                        final String finalEventTitle = eventTitle;
+
+                        // Fetch recipient name
+                        db.collection("entrants").document(recipientId).get()
+                            .addOnSuccessListener(entrantDoc -> {
+                                String recipientName = "Unknown Entrant";
+                                if (entrantDoc.exists() && entrantDoc.getString("name") != null) {
+                                    recipientName = entrantDoc.getString("name");
+                                }
+
+                                // Create and write log entry
+                                writeLogEntry(organizerId, finalOrganizerName, recipientId, recipientName,
+                                    eventId, finalEventTitle, message, timestamp, type, status, context);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firebase", "Failed to fetch entrant name", e);
+                                // Continue logging with "Unknown Entrant"
+                                writeLogEntry(organizerId, finalOrganizerName, recipientId, "Unknown Entrant",
+                                    eventId, finalEventTitle, message, timestamp, type, status, context);
+                            });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firebase", "Failed to fetch event title", e);
+                        // Continue logging with "Unknown Event"
+                        createLogWithDefaults(organizerId, finalOrganizerName, recipientId, null,
+                            eventId, "Unknown Event", message, timestamp, type, status, context);
+                    });
+            })
+            .addOnFailureListener(e -> {
+                Log.e("Firebase", "Failed to fetch organizer name", e);
+                // Continue logging with "Unknown Organizer"
+                createLogWithDefaults(organizerId, "Unknown Organizer", recipientId, null,
+                    eventId, null, message, timestamp, type, status, context);
+            });
+    }
+
+    /**
+     * Helper method to create a log entry when some enrichment data is unavailable.
+     * This ensures logs are still created even if some Firestore reads fail.
+     */
+    private static void createLogWithDefaults(String organizerId, String organizerName,
+                                              String recipientId, String recipientName,
+                                              String eventId, String eventTitle,
+                                              String message, long timestamp,
+                                              String type, String status, Context context) {
+        // If recipientName is null, try to fetch it
+        if (recipientName == null) {
+            db.collection("entrants").document(recipientId).get()
+                .addOnSuccessListener(entrantDoc -> {
+                    String name = "Unknown Entrant";
+                    if (entrantDoc.exists() && entrantDoc.getString("name") != null) {
+                        name = entrantDoc.getString("name");
+                    }
+                    writeLogEntry(organizerId, organizerName, recipientId, name,
+                        eventId, eventTitle != null ? eventTitle : "Unknown Event",
+                        message, timestamp, type, status, context);
+                })
+                .addOnFailureListener(e -> {
+                    writeLogEntry(organizerId, organizerName, recipientId, "Unknown Entrant",
+                        eventId, eventTitle != null ? eventTitle : "Unknown Event",
+                        message, timestamp, type, status, context);
+                });
+        } else if (eventTitle == null) {
+            // If eventTitle is null, try to fetch it
+            db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDoc -> {
+                    String title = "Unknown Event";
+                    if (eventDoc.exists() && eventDoc.getString("title") != null) {
+                        title = eventDoc.getString("title");
+                    }
+                    writeLogEntry(organizerId, organizerName, recipientId, recipientName,
+                        eventId, title, message, timestamp, type, status, context);
+                })
+                .addOnFailureListener(e -> {
+                    writeLogEntry(organizerId, organizerName, recipientId, recipientName,
+                        eventId, "Unknown Event", message, timestamp, type, status, context);
+                });
+        } else {
+            writeLogEntry(organizerId, organizerName, recipientId, recipientName,
+                eventId, eventTitle, message, timestamp, type, status, context);
+        }
+    }
+
+    /**
+     * Final step: writes the log entry to Firestore.
+     */
+    private static void writeLogEntry(String organizerId, String organizerName,
+                                      String recipientId, String recipientName,
+                                      String eventId, String eventTitle,
+                                      String message, long timestamp,
+                                      String type, String status, Context context) {
+        Map<String, Object> logEntry = new HashMap<>();
+        logEntry.put("organizerId", organizerId);
+        logEntry.put("organizerName", organizerName);
+        logEntry.put("recipientId", recipientId);
+        logEntry.put("recipientName", recipientName);
+        logEntry.put("eventId", eventId);
+        logEntry.put("eventTitle", eventTitle);
+        logEntry.put("message", message);
+        logEntry.put("timestamp", timestamp);
+        logEntry.put("type", type);
+        logEntry.put("status", status);
+
+        db.collection("notification_logs")
+            .add(logEntry)
+            .addOnSuccessListener(docRef ->
+                Log.d("Firebase", "Notification logged: " + docRef.getId()))
+            .addOnFailureListener(e -> {
+                Log.e("Firebase", "Failed to log notification", e);
+                if (context != null) {
+                    Toast.makeText(context, "Notification sent but logging failed: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+
+    /**
+     * Migrates historical notifications from the "notifications" collection to "notification_logs".
+     * <p>
+     * This method queries notifications from the last 30 days and creates corresponding entries
+     * in the notification_logs collection with enriched data (organizer name, event title, recipient name).
+     * The organizerId is derived from the event document since old notifications don't store it directly.
+     * <p>
+     * This migration runs asynchronously and does not block the UI. It should be called once when
+     * the admin app starts for the first time.
+     *
+     * @param context  The context for displaying error messages
+     * @param callback Callback to report migration progress and completion
+     */
+    public static void migrateHistoricalNotifications(Context context, MigrationCallback callback) {
+        // Calculate timestamp for 30 days ago
+        long thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000;
+        long cutoffTimestamp = System.currentTimeMillis() - thirtyDaysInMillis;
+
+        Log.d("Firebase", "Starting migration of notifications from last 30 days");
+
+        // Query notifications from last 30 days
+        db.collection("notifications")
+            .whereGreaterThanOrEqualTo("timestamp", cutoffTimestamp)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(500)
+            .get()
+            .addOnSuccessListener(querySnapshot -> {
+                if (querySnapshot.isEmpty()) {
+                    Log.d("Firebase", "No notifications to migrate");
+                    callback.onMigrationComplete(0, 0);
+                    return;
+                }
+
+                int totalNotifications = querySnapshot.size();
+                final int[] successCount = {0};
+                final int[] failureCount = {0};
+                final int[] processedCount = {0};
+
+                Log.d("Firebase", "Found " + totalNotifications + " notifications to migrate");
+
+                // Process each notification
+                for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
+                    String eventId = notificationDoc.getString("eventId");
+                    String recipientId = notificationDoc.getString("entrantId");
+                    String message = notificationDoc.getString("message");
+                    Long timestampLong = notificationDoc.getLong("timestamp");
+                    String status = notificationDoc.getString("status");
+                    String type = notificationDoc.getString("type");
+
+                    // Default type to "custom" if missing
+                    if (type == null) {
+                        type = "custom";
+                    }
+
+                    long timestamp = timestampLong != null ? timestampLong : System.currentTimeMillis();
+                    final String finalType = type;
+
+                    // Fetch event document to get organizerId
+                    db.collection("events").document(eventId).get()
+                        .addOnSuccessListener(eventDoc -> {
+                            String organizerId = "unknown";
+                            if (eventDoc.exists()) {
+                                // Events store organizerId in the description field
+                                String docOrganizerId = eventDoc.getString("organizerId");
+                                if (docOrganizerId != null) {
+                                    organizerId = docOrganizerId;
+                                }
+                            }
+
+                            // Use logNotification to create enriched log entry
+                            // Pass null context to avoid showing toast for each migration
+                            logNotification(
+                                organizerId,
+                                recipientId,
+                                eventId,
+                                message,
+                                timestamp,
+                                finalType,
+                                status,
+                                null  // Don't show toast for historical migrations
+                            );
+
+                            successCount[0]++;
+                            processedCount[0]++;
+
+                            // Check if all notifications have been processed
+                            if (processedCount[0] == totalNotifications) {
+                                Log.d("Firebase", "Migration complete: " + successCount[0] +
+                                    " succeeded, " + failureCount[0] + " failed");
+                                callback.onMigrationComplete(successCount[0], failureCount[0]);
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("Firebase", "Failed to fetch event for migration: " + e.getMessage());
+
+                            // Still try to migrate with "unknown" organizerId
+                            logNotification(
+                                "unknown",
+                                recipientId,
+                                eventId,
+                                message,
+                                timestamp,
+                                finalType,
+                                status,
+                                null
+                            );
+
+                            failureCount[0]++;
+                            processedCount[0]++;
+
+                            // Check if all notifications have been processed
+                            if (processedCount[0] == totalNotifications) {
+                                Log.d("Firebase", "Migration complete: " + successCount[0] +
+                                    " succeeded, " + failureCount[0] + " failed");
+                                callback.onMigrationComplete(successCount[0], failureCount[0]);
+                            }
+                        });
+                }
+            })
+            .addOnFailureListener(e -> {
+                Log.e("Firebase", "Failed to query notifications for migration", e);
+                callback.onMigrationError("Failed to query notifications: " + e.getMessage());
+            });
     }
 
 }
