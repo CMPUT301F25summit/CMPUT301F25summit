@@ -45,7 +45,7 @@ public class ProfileOrganizerFragment extends Fragment {
     private Button editBtn, deleteBtn;
     private Organizer organizer;
     private FirebaseFirestore db;
-    private TextView tvName, tvEmail, tvPhone, tvCity;
+    private TextView tvName, tvEmail, tvPhone;
 
 
     /**
@@ -82,7 +82,6 @@ public class ProfileOrganizerFragment extends Fragment {
                             tvName.setText(organizer.getName());
                             tvEmail.setText(organizer.getEmail());
                             tvPhone.setText(organizer.getPhone());
-                            tvCity.setText("Calgary"); // need get city method
                         }
                     } else {
                         Toast.makeText(requireContext(), "No Organizer found.", Toast.LENGTH_SHORT).show();
@@ -113,7 +112,6 @@ public class ProfileOrganizerFragment extends Fragment {
         eName.setText(organizer.getName());
         eEmail.setText(organizer.getEmail());
         ePhone.setText(organizer.getPhone());
-        eCity.setText("Calgary"); // entrant.getCity
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
@@ -121,8 +119,6 @@ public class ProfileOrganizerFragment extends Fragment {
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     organizer.setName(eName.getText().toString().trim());
                     organizer.setEmail(eEmail.getText().toString().trim());
-                    // entrant.setphone
-                    // entrant.setcity
 
                     Firebase.saveOrganizer(organizer);
 
