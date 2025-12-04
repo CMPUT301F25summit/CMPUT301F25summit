@@ -28,7 +28,9 @@ public class Event {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
+    public void removeEntrantFromWaitList(Entrant entrant) {
+        this.waitingList.remove(entrant);
+    }
     public EventDescription getDescription() { return description; }
     public EventDescription getEventDescription() { return description; }
     public void setDescription(EventDescription description) { this.description = description; }

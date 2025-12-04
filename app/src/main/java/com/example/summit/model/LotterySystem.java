@@ -79,6 +79,7 @@ public class LotterySystem {
         }
     }
 
+
     /***
      *
      * @return List of accepted entrants

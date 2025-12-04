@@ -26,6 +26,7 @@ import com.example.summit.R;
 import com.example.summit.model.Event;
 import com.example.summit.model.EventDescription;
 import com.example.summit.model.Entrant;
+import com.example.summit.model.LotterySystem;
 import com.example.summit.session.Session;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -38,7 +39,7 @@ public class EventDetailsEntrantFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String eventId;
-    private Button joinBtn;
+    private Button joinBtn, leaveWaitlistButton;
     private Event currentEvent;
 
     private ProgressBar progressBar;
@@ -64,6 +65,18 @@ public class EventDetailsEntrantFragment extends Fragment {
         ImageView poster = view.findViewById(R.id.image_event_poster);
         joinBtn = view.findViewById(R.id.button_join_event_entrant);
         ImageButton closeBtn = view.findViewById(R.id.button_close);
+        leaveWaitlistButton = view.findViewById(R.id.button_leave_event_entrant);
+        final Entrant currentUser = Session.getEntrant();
+
+        leaveWaitlistButton.setOnClickListener(v -> {
+            if (currentUser != null && currentEvent != null) {
+                currentEvent.removeEntrantFromWaitList(currentUser);
+
+
+                // Update the UI, show a confirmation, etc.
+                Toast.makeText(getContext(), "You have left the waitlist.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         closeBtn.setOnClickListener(v -> {
             NavHostFragment.findNavController(this).navigateUp();

@@ -35,6 +35,7 @@ public class Entrant extends User {
         return "Entrant";
     }
 
+
     //entrant specific methods below
     public void setLocation(GeoPoint location) {
         this.location = location;

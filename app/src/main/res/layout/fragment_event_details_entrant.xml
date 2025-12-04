@@ -85,6 +85,14 @@
                 android:textColor="@android:color/white"
                 app:backgroundTint="#212121" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_leave_event_entrant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Leave Event"
+                android:textColor="@android:color/white"
+                app:backgroundTint="#212121" />
+
         </LinearLayout>
     </ScrollView>
 
